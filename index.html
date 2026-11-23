@@ -233,6 +233,15 @@
     .cards,.skills,.edu,.certs,.contact-list{grid-template-columns:1fr}
     .job{padding:40px 0}
   }
+
+  /* ---------- Alternar computador / celular ---------- */
+  .view-toggle{position:fixed;right:20px;bottom:20px;z-index:50;padding:11px 18px;border-radius:999px;border:1px solid #ffffff30;background:var(--ink);color:#fff;font:600 14px var(--body);cursor:pointer;box-shadow:0 6px 20px #0e171940;transition:background .2s}
+  .view-toggle:hover{background:var(--ink-2)}
+  .phone-view{position:fixed;inset:0;z-index:40;background:#0E1719F0;display:none;align-items:center;justify-content:center;padding:24px}
+  .phone-view.on{display:flex}
+  .phone-view iframe{width:410px;height:min(864px,calc(100vh - 48px));border:10px solid #000;border-radius:36px;background:var(--cream);box-shadow:0 20px 60px #0009}
+  body.no-scroll{overflow:hidden}
+  @media (max-width:620px){.view-toggle{display:none}}
 </style>
 </head>
 <body>
@@ -440,7 +449,7 @@
           <h4>Sistema Computacional de apoio à Vigilância Genômica e Preditiva de Arboviroses</h4>
           <p class="award">Eleito Melhor Projeto da turma de 2026 do IDASH</p>
           <p>Projeto final do programa Informatics and Data Science for Health (IDASH), da University of Washington em parceria com o CDC. O SDS antecipa surtos de arboviroses a partir de séries históricas e gera sinais de alerta para orientar a resposta da vigilância.</p>
-          <p class="tools"><b>Arquitetura:</b> FastAPI, Kafka, PostgreSQL, ClickHouse, Machine Learning etc/p>
+          <p class="tools"><b>Arquitetura:</b> FastAPI, Kafka, PostgreSQL, ClickHouse, Machine Learning etc.</p>
           <div class="plinks">
             <a class="plink" href="docs/noticia-idash-sds.pdf" target="_blank" rel="noopener">Ler a notícia do Ministério da Saúde (PDF) ↗</a>
             <a class="plink" href="https://go2itech.org/education-workforce-development/idash/" target="_blank" rel="noopener">O que é o programa IDASH ↗</a>
@@ -607,6 +616,10 @@
   </div>
 </section>
 
+<!-- ================= ALTERNAR COMPUTADOR / CELULAR ================= -->
+<button class="view-toggle" type="button" aria-pressed="false">Ver no celular</button>
+<div class="phone-view"></div>
+
 <script>
   // pontos do gráfico do hero (determinísticos)
   (function(){
@@ -664,6 +677,31 @@
       catch(e){ b.textContent=t; }
     });
   });
+
+  // alternar visualização computador / celular
+  (function(){
+    var btn=document.querySelector('.view-toggle'), box=document.querySelector('.phone-view');
+    if(!btn||!box) return;
+    // dentro da prévia não mostra o botão
+    if(new URLSearchParams(location.search).has('celular')){btn.remove();box.remove();return;}
+
+    function toggle(on){
+      if(on && !box.firstChild){
+        var u=new URL(location.href); u.hash=''; u.searchParams.set('celular','1');
+        var f=document.createElement('iframe');
+        f.src=u.href; f.title='Prévia do portfólio no celular';
+        box.appendChild(f);
+      }
+      box.classList.toggle('on',on);
+      document.body.classList.toggle('no-scroll',on);
+      btn.setAttribute('aria-pressed',on);
+      btn.textContent=on?'Ver no computador':'Ver no celular';
+    }
+
+    btn.addEventListener('click',function(){toggle(!box.classList.contains('on'))});
+    box.addEventListener('click',function(e){if(e.target===box) toggle(false)});
+    document.addEventListener('keydown',function(e){if(e.key==='Escape'&&box.classList.contains('on')) toggle(false)});
+  })();
 </script>
 </body>
 </html>
