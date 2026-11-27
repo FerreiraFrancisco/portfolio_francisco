@@ -4,136 +4,182 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Brasileirão 2022: o que separa o G6 do Z4 · Francisco Iago</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400..650&family=Geist+Mono:wght@400&display=swap" rel="stylesheet">
 <meta name="description" content="Revisão do TCC (UnB, 2023): análise fatorial por 90 minutos do desempenho de jogadores do Brasileirão Série A 2022.">
 <style>
+/* Sistema visual compartilhado com o portfólio (Instrument Serif + Geist) */
 :root{
   color-scheme:light;
-  --page:#f9f9f7; --surface:#fcfcfb; --surface-2:#f3f2ee;
-  --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781;
-  --grid:#e1e0d9; --axis:#c3c2b7; --ring:rgba(11,11,11,.10);
+  --page:#F3EFE7; --surface:#FBF9F5; --surface-2:#ECE7DC;
+  --ink:#121A1C; --ink-2:#3A4447; --muted:#687174;
+  --grid:#E2DDD2; --axis:#C9C3B6; --ring:rgba(18,26,28,.12);
   --g6:#2a78d6; --z4:#eb6834; --other:#b5b3ab;
-  --div-neg:#d03b3b; --div-mid:#f0efec; --div-pos:#2a78d6;
-  --accent:#2a78d6; --good:#006300;
+  --div-neg:#d03b3b; --div-mid:#F1ECE2; --div-pos:#2a78d6;
+  --accent:#1C6157; --link:#1C6157; --good:#1a7a4c; --amber:#E8A33D;
   --r1:#1baf7a; --r2:#6250d6; --r3:#eda100;
+  --serif:"Instrument Serif","Iowan Old Style","Times New Roman",serif;
+  --sans:"Geist",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"Geist Mono",ui-monospace,Menlo,monospace;
+  --ease-out:cubic-bezier(0.23,1,0.32,1);
 }
 @media (prefers-color-scheme:dark){
   :root:where(:not([data-theme="light"])){
     color-scheme:dark;
-    --page:#0d0d0d; --surface:#1a1a19; --surface-2:#232321;
-    --ink:#f0efec; --ink-2:#c3c2b7; --muted:#898781;
-    --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,.10);
-    --g6:#3987e5; --z4:#d95926; --other:#56554f;
-    --div-neg:#e66767; --div-mid:#383835; --div-pos:#3987e5;
-    --accent:#3987e5; --good:#0ca30c;
+    --page:#0B1315; --surface:#111C1F; --surface-2:#1A282C;
+    --ink:#ECE8DF; --ink-2:#B4BCBA; --muted:#7E8A88;
+    --grid:#1F2C2F; --axis:#33413F; --ring:rgba(255,255,255,.09);
+    --g6:#3987e5; --z4:#e0642f; --other:#5c6664;
+    --div-neg:#e66767; --div-mid:#1A282C; --div-pos:#3987e5;
+    --accent:#5BC4A0; --link:#7fd3b6; --good:#3fbf7f;
     --r1:#199e70; --r2:#9085e9; --r3:#c98500;
   }
 }
 :root[data-theme="dark"]{
   color-scheme:dark;
-  --page:#0d0d0d; --surface:#1a1a19; --surface-2:#232321;
-  --ink:#f0efec; --ink-2:#c3c2b7; --muted:#898781;
-  --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,.10);
-  --g6:#3987e5; --z4:#d95926; --other:#56554f;
-  --div-neg:#e66767; --div-mid:#383835; --div-pos:#3987e5;
-  --accent:#3987e5; --good:#0ca30c;
+  --page:#0B1315; --surface:#111C1F; --surface-2:#1A282C;
+  --ink:#ECE8DF; --ink-2:#B4BCBA; --muted:#7E8A88;
+  --grid:#1F2C2F; --axis:#33413F; --ring:rgba(255,255,255,.09);
+  --g6:#3987e5; --z4:#e0642f; --other:#5c6664;
+  --div-neg:#e66767; --div-mid:#1A282C; --div-pos:#3987e5;
+  --accent:#5BC4A0; --link:#7fd3b6; --good:#3fbf7f;
   --r1:#199e70; --r2:#9085e9; --r3:#c98500;
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--page);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
-a{color:var(--accent)}
-.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
-header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--page) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--ring)}
-header.top .wrap{display:flex;align-items:center;gap:24px;height:56px}
-.brand{font-weight:650;font-size:14px;letter-spacing:.01em}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--page);color:var(--ink);font:15.5px/1.6 var(--sans);-webkit-font-smoothing:antialiased;font-feature-settings:"ss01"}
+::selection{background:var(--amber);color:#0B1315}
+a{color:var(--link);text-underline-offset:3px;text-decoration-thickness:1px}
+:focus-visible{outline:2px solid var(--amber);outline-offset:3px;border-radius:4px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 32px}
+code{font-family:var(--mono);font-size:.9em}
+
+/* cabeçalho */
+header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--page) 82%,transparent);-webkit-backdrop-filter:saturate(140%) blur(12px);backdrop-filter:saturate(140%) blur(12px);border-bottom:1px solid var(--ring)}
+header.top .wrap{display:flex;align-items:center;gap:20px;height:60px}
+.brand{font-weight:600;font-size:14.5px;letter-spacing:.01em;color:var(--ink);text-decoration:none;white-space:nowrap}
+.brand b{font-weight:600}
+.brand span{color:var(--amber)}
+.views{display:flex;gap:2px;padding:3px;border-radius:999px;background:var(--surface-2);border:1px solid var(--ring)}
+.views a{font-size:13px;font-weight:500;padding:5px 12px;border-radius:999px;color:var(--ink-2);text-decoration:none;white-space:nowrap;transition:color .2s ease,background-color .2s ease}
+.views a[aria-current="page"]{background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--ring)}
 nav.links{display:flex;gap:18px;margin-left:auto;font-size:13.5px}
-nav.links a{color:var(--ink-2);text-decoration:none}
-nav.links a:hover{color:var(--ink)}
-.btn-theme{border:1px solid var(--ring);background:var(--surface);color:var(--ink-2);border-radius:8px;padding:5px 10px;font:inherit;font-size:13px;cursor:pointer}
-.hero{padding-top:64px;padding-bottom:36px}
-.eyebrow{font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
-h1{font-size:clamp(30px,4.4vw,48px);line-height:1.08;letter-spacing:-.02em;margin:12px 0 16px;font-weight:700;max-width:880px}
-.lede{font-size:18px;color:var(--ink-2);max-width:760px;margin:0}
-.byline{margin-top:22px;font-size:13.5px;color:var(--muted)}
-.byline b{color:var(--ink-2);font-weight:600}
-section{padding:44px 0;border-top:1px solid var(--ring)}
-h2{font-size:26px;letter-spacing:-.01em;margin:0 0 6px;font-weight:680}
-h3{font-size:16px;margin:0 0 4px;font-weight:650}
-.sub{color:var(--ink-2);margin:0 0 24px;max-width:780px}
-.card{background:var(--surface);border:1px solid var(--ring);border-radius:14px;padding:20px}
+nav.links a{color:var(--ink-2);text-decoration:none;transition:color .2s ease}
+.btn-theme{border:1px solid var(--ring);background:var(--surface);color:var(--ink-2);border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer;transition:transform 160ms var(--ease-out),background-color .2s ease}
+.btn-theme:active,.tabs button:active{transform:scale(.97)}
+@media (hover:hover) and (pointer:fine){nav.links a:hover,.views a:hover{color:var(--ink)}.btn-theme:hover{background:var(--surface-2)}}
+
+/* abertura */
+.hero{padding-top:clamp(56px,8vw,104px);padding-bottom:28px}
+.eyebrow,.mono{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:400}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(52px,8.4vw,112px);line-height:.92;letter-spacing:-.028em;margin:18px 0 18px;max-width:980px;text-wrap:balance}
+.subtitle{font-family:var(--serif);font-style:italic;font-size:clamp(24px,2.6vw,34px);line-height:1.15;color:var(--ink-2);margin:0 0 26px;max-width:860px;letter-spacing:-.01em}
+.lede{font-size:18px;line-height:1.55;color:var(--ink-2);max-width:720px;margin:0;text-wrap:pretty}
+.byline{margin-top:24px;font-size:13.5px;color:var(--muted)}
+.byline b{color:var(--ink);font-weight:600}
+
+/* resposta curta */
+.answer{margin-top:clamp(40px,6vw,64px);border-top:1px solid var(--ink);padding-top:18px}
+.answer-hd{display:flex;justify-content:space-between;gap:16px;align-items:baseline;margin-bottom:20px}
+.answer ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px}
+.answer li{display:grid;gap:10px;align-content:start}
+.answer .k{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--muted)}
+.answer li b{font-family:var(--serif);font-weight:400;font-size:clamp(26px,2.4vw,32px);line-height:1.04;letter-spacing:-.012em;color:var(--ink)}
+.answer li p{margin:0;color:var(--ink-2);font-size:14.5px;text-wrap:pretty}
+
+/* seções */
+section{padding:clamp(56px,8vw,96px) 0;border-top:1px solid var(--ring)}
+h2{font-family:var(--serif);font-weight:400;font-size:clamp(38px,4.6vw,60px);line-height:.98;letter-spacing:-.022em;margin:0 0 14px;display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;text-wrap:balance}
+h2 .idx{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--muted);align-self:flex-start;margin-top:.5em}
+h3{font-size:15.5px;margin:0 0 4px;font-weight:600;letter-spacing:-.005em}
+.sub{color:var(--ink-2);margin:0 0 32px;max-width:760px;font-size:16.5px;text-wrap:pretty}
+.card{background:var(--surface);border:1px solid var(--ring);border-radius:16px;padding:22px}
 .card h3+.note{margin-top:0}
-.note{font-size:13px;color:var(--muted);margin:6px 0 0}
+.note{font-size:13px;color:var(--muted);margin:6px 0 0;text-wrap:pretty}
 .grid{display:grid;gap:16px}
 .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .g3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .g4{grid-template-columns:repeat(4,minmax(0,1fr))}
-@media (max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr}nav.links{display:none}}
-.tile .v{font-size:34px;font-weight:680;letter-spacing:-.02em;line-height:1.1;font-variant-numeric:tabular-nums}
-.tile .l{font-size:13px;color:var(--ink-2);margin-top:4px}
+@media (max-width:960px){.g2,.g3,.g4{grid-template-columns:1fr}nav.links{display:none}.answer ol{grid-template-columns:1fr;gap:24px}.kpis.g4,#posTiles.g4{grid-template-columns:1fr 1fr}}
+.tile{display:flex;flex-direction:column}
+.tile .v{font-family:var(--serif);font-size:44px!important;font-weight:400;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
+.tile .l{font-size:13.5px;color:var(--ink-2);margin-top:10px}
 .tile .d{font-size:12.5px;color:var(--muted);margin-top:2px}
-.fix{display:grid;grid-template-columns:28px 1fr;gap:12px;padding:16px 0;border-top:1px solid var(--ring)}
+.kpis{margin-top:36px}
+.kpis .tile{background:transparent;border:0;border-top:1px solid var(--ring);border-radius:0;padding:16px 0 0}
+.fix{display:grid;grid-template-columns:30px 1fr;gap:12px;padding:18px 0;border-top:1px solid var(--ring)}
 .fix:first-child{border-top:0;padding-top:0}
-.fix .n{width:26px;height:26px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-size:12.5px;font-weight:650;color:var(--ink-2)}
-.fix p{margin:4px 0 0;color:var(--ink-2);font-size:14px}
-.fix .tag{display:inline-block;font-size:11.5px;font-weight:600;padding:1px 8px;border-radius:99px;background:var(--surface-2);color:var(--ink-2);margin-left:6px;vertical-align:1px}
-.steps{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;counter-reset:s}
-@media (max-width:900px){.steps{grid-template-columns:1fr 1fr}}
-.step{background:var(--surface);border:1px solid var(--ring);border-radius:12px;padding:14px;font-size:13px;color:var(--ink-2)}
-.step b{display:block;color:var(--ink);font-size:13.5px;margin-bottom:4px}
-.step b::before{counter-increment:s;content:counter(s) " · ";color:var(--muted);font-weight:500}
-.tabs{display:flex;gap:4px;background:var(--surface-2);padding:4px;border-radius:12px;width:max-content;max-width:100%;overflow-x:auto;margin-bottom:20px}
-.tabs button{border:0;background:transparent;color:var(--ink-2);font:inherit;font-size:14px;font-weight:550;padding:8px 16px;border-radius:9px;cursor:pointer;white-space:nowrap}
-.tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--ring)}
-.fcard{display:flex;flex-direction:column;gap:10px}
+.fix .n{width:28px;height:28px;border-radius:50%;border:1px solid var(--ring);display:grid;place-items:center;font-family:var(--mono);font-size:12px;color:var(--ink-2)}
+.fix b{font-weight:600}
+.fix p{margin:6px 0 0;color:var(--ink-2);font-size:14.5px}
+.fix .tag{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:99px;background:var(--surface-2);color:var(--ink-2);margin-left:8px;vertical-align:2px}
+.steps{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));counter-reset:s;border-top:1px solid var(--ink)}
+.step{padding:16px 16px 4px;font-size:13.5px;color:var(--ink-2);border-right:1px solid var(--ring)}
+.step:first-child{padding-left:0}
+.step:last-child{border-right:0}
+.step b{display:block;color:var(--ink);font-family:var(--serif);font-weight:400;font-size:22px;line-height:1.1;margin-bottom:8px}
+.step b::before{counter-increment:s;content:counter(s,decimal-leading-zero);display:block;font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:10px;letter-spacing:.06em}
+@media (max-width:960px){.steps{grid-template-columns:1fr 1fr}.step,.step:first-child{padding:14px 12px 12px 0;border-right:0;border-bottom:1px solid var(--ring)}}
+.tabs{display:flex;gap:3px;background:var(--surface-2);padding:4px;border-radius:999px;width:max-content;max-width:100%;overflow-x:auto;margin-bottom:24px;border:1px solid var(--ring)}
+.tabs button{border:0;background:transparent;color:var(--ink-2);font:inherit;font-size:14px;font-weight:500;padding:8px 18px;border-radius:999px;cursor:pointer;white-space:nowrap;transition:color .2s ease,background-color .2s ease,transform 160ms var(--ease-out)}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--ring),0 1px 2px rgba(0,0,0,.05)}
+.fcard{display:flex;flex-direction:column;gap:12px}
 .fcard .hd{display:flex;align-items:baseline;gap:10px}
-.fcard .fx{font-size:12px;font-weight:650;color:var(--muted)}
-.fcard .ve{margin-left:auto;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
-.fcard .desc{font-size:13.5px;color:var(--ink-2);margin:0;min-height:62px}
-.verdict{font-size:13px;padding:8px 10px;border-radius:8px;background:var(--surface-2);color:var(--ink-2)}
-.verdict b{color:var(--ink)}
-.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px}
-.controls label{font-size:12.5px;color:var(--muted);display:flex;gap:6px;align-items:center}
-select,input[type=search]{font:inherit;font-size:13.5px;background:var(--surface);color:var(--ink);border:1px solid var(--ring);border-radius:8px;padding:6px 10px}
+.fcard .hd h3{font-family:var(--serif);font-weight:400;font-size:26px;line-height:1.05;letter-spacing:-.01em}
+.fcard .fx{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.fcard .ve{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fcard .desc{font-size:14px;color:var(--ink-2);margin:0;min-height:66px}
+.verdict{font-size:13px;padding:10px 12px;border-radius:10px;background:var(--surface-2);color:var(--ink-2)}
+.verdict b{color:var(--ink);font-weight:600}
+.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:12px}
+.controls label{font-size:12.5px;color:var(--muted);display:flex;gap:8px;align-items:center}
+select,input[type=search]{font:inherit;font-size:13.5px;background:var(--surface);color:var(--ink);border:1px solid var(--ring);border-radius:10px;padding:7px 10px}
 input[type=search]{min-width:220px}
 .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-2)}
 .legend span{display:inline-flex;align-items:center;gap:6px}
-.legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.legend i{width:9px;height:9px;border-radius:50%;display:inline-block}
 svg{display:block;overflow:visible}
-svg text{fill:var(--muted);font-size:11.5px;font-family:inherit}
+svg text{fill:var(--muted);font-size:11.5px;font-family:var(--sans)}
 svg .ink{fill:var(--ink)} svg .ink2{fill:var(--ink-2)}
-.tt{position:fixed;pointer-events:none;z-index:50;background:var(--surface);border:1px solid var(--ring);box-shadow:0 6px 24px rgba(0,0,0,.14);border-radius:10px;padding:8px 10px;font-size:12.5px;color:var(--ink-2);opacity:0;transition:opacity .08s;max-width:280px}
+.tt{position:fixed;pointer-events:none;z-index:50;background:var(--surface);border:1px solid var(--ring);box-shadow:0 10px 30px -8px rgba(0,0,0,.25);border-radius:12px;padding:10px 12px;font-size:12.5px;color:var(--ink-2);opacity:0;transition:opacity .1s ease;max-width:280px}
 .tt b{color:var(--ink);font-size:13.5px}
 .tt .row{display:flex;gap:8px;align-items:center}
 .tt .k{width:12px;height:2px;border-radius:1px}
 table{border-collapse:collapse;width:100%;font-size:13.5px;font-variant-numeric:tabular-nums}
-th{font-size:12px;font-weight:600;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--axis)}
-td{padding:7px 10px;border-bottom:1px solid var(--grid);color:var(--ink-2)}
-td.name{color:var(--ink);font-weight:550}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;font-weight:400;color:var(--muted);text-align:left;padding:9px 10px;border-bottom:1px solid var(--axis)}
+td{padding:8px 10px;border-bottom:1px solid var(--grid);color:var(--ink-2)}
+td.name{color:var(--ink);font-weight:500}
 tr.hl td{background:var(--surface-2)}
 .bar{height:8px;border-radius:0 4px 4px 0;display:inline-block;vertical-align:middle}
 .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;vertical-align:0}
 .profile{display:none}
 .profile.on{display:block}
 .profile .pf-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-.profile .pf-head b{font-size:18px}
-details{margin-top:10px}
+.profile .pf-head b{font-family:var(--serif);font-weight:400;font-size:28px;line-height:1}
+details{margin-top:12px}
 summary{cursor:pointer;font-size:13px;color:var(--ink-2)}
-.concl li{margin:0 0 10px;color:var(--ink-2)}
-.concl li b{color:var(--ink)}
-footer{padding:40px 0 60px;color:var(--muted);font-size:13px;border-top:1px solid var(--ring)}
-.kicker{font-size:13px;color:var(--muted);margin:0 0 4px}
-.pill{font-size:12px;padding:2px 8px;border-radius:99px;border:1px solid var(--ring);color:var(--ink-2)}
+.concl ul{padding-left:0!important;list-style:none}
+.concl li{margin:0;padding:14px 0;border-top:1px solid var(--ring);color:var(--ink-2)}
+.concl li:first-child{border-top:0;padding-top:4px}
+.concl li b{color:var(--ink);font-weight:600}
+footer{padding:44px 0 72px;color:var(--muted);font-size:13.5px;border-top:1px solid var(--ring)}
+footer .wrap{display:flex;flex-wrap:wrap;gap:8px 28px;justify-content:space-between}
+.kicker{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.pill{font-size:12px;padding:2px 9px;border-radius:99px;border:1px solid var(--ring);color:var(--ink-2)}
 .sr{position:absolute;left:-9999px}
 .grid>*{min-width:0}
 main,section{overflow-x:clip}
-@media (max-width:600px){input[type=search]{min-width:0;width:100%}.wrap{padding:0 16px}h1{font-size:28px}}
+@media (max-width:640px){input[type=search]{min-width:0;width:100%}.wrap{padding:0 18px}header.top .wrap{gap:12px}.views a{padding:5px 10px}.brand b{font-size:0}.brand b::before{content:"FI";font-size:14.5px}.tile .v{font-size:38px!important}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
 </style>
 </head>
 <body>
 <header class="top"><div class="wrap">
-  <a class="brand" href="../index.html#academico" style="text-decoration:none;color:inherit">Francisco Iago · Portfólio</a>
-  <nav class="links">
-    <a href="#contexto">Contexto</a><a href="#revisao">Revisão do TCC</a><a href="#metodo">Método</a><a href="#painel">Painel</a><a href="#conclusoes">Conclusões</a><a href="relatorio.html">Relatório (Quarto)</a>
+  <a class="brand" href="../index.html#academico"><b>Francisco Iago</b><span>.</span></a>
+  <nav class="views" aria-label="Versões do estudo"><a href="#" aria-current="page">Dashboard</a><a href="relatorio.html">Relatório</a></nav>
+  <nav class="links" aria-label="Seções">
+    <a href="#contexto">Contexto</a><a href="#revisao">Revisão</a><a href="#metodo">Método</a><a href="#painel">Painel</a><a href="#conclusoes">Conclusões</a>
   </nav>
   <button class="btn-theme" id="themeBtn" type="button">Tema</button>
 </div></header>
@@ -141,18 +187,25 @@ main,section{overflow-x:clip}
 <main>
 <div class="wrap hero">
   <div class="eyebrow">TCC revisitado · Estatística UnB · Brasileirão Série A 2022</div>
-  <h1>O que separa o G6 do Z4? Uma análise fatorial do desempenho por 90 minutos</h1>
-  <p class="lede">Revisão do meu Trabalho de Conclusão de Curso. Corrigi problemas de dados e de método da versão original e troquei a PCA sobre os totais da temporada por uma análise fatorial por 90 minutos, considerando apenas jogadores com mais de 1.180 minutos em campo.</p>
+  <h1>O que separa o G6 do Z4?</h1>
+  <p class="subtitle">Análise fatorial e funções táticas dos jogadores de linha, com métricas por 90 minutos</p>
+  <p class="lede">Revisão do meu Trabalho de Conclusão de Curso. Corrigi problemas de dados e de método da versão original, troquei a PCA sobre os totais da temporada por uma análise fatorial por 90 minutos e identifiquei a função tática de cada jogador.</p>
   <div class="byline"><b>Francisco Iago dos Reis Ferreira</b> · orientação: Prof. Gladston Luiz da Silva · TCC original 2023, revisão nov/2026 · dados: FBref</div>
-</div>
 
-<div class="wrap">
-  <div class="grid g4" id="kpis"></div>
-  <p class="note" style="margin-top:10px">* A PCA original explicava mais variância porque os totais de temporada são muito correlacionados entre si (todos crescem com os minutos). Variância explicada maior, nesse caso, não indica um modelo melhor.</p>
+  <div class="answer">
+    <div class="answer-hd"><span class="mono">A resposta curta</span><a class="mono" href="#conclusoes" style="color:var(--muted);text-decoration:none">todos os achados ↓</a></div>
+    <ol>
+      <li><span class="k">01</span><b>A maior diferença está nos pontas.</b><p>Os pontas do G6 jogam muito mais no último terço: tocam na bola no ataque, driblam, pressionam e põem bolas na área (rank-bisserial 0,79; p Holm = 0,006).</p></li>
+      <li><span class="k">02</span><b>Na defesa, o G6 recupera mais a bola.</b><p>A vantagem aparece sobretudo nos zagueiros. O “apoio ofensivo dos laterais”, que o TCC original apontava como decisivo, descreve a função do jogador, não a qualidade.</p></li>
+      <li><span class="k">03</span><b>Faltavam meias ofensivos no Z4.</b><p>Só 2 dos 12 meias do Z4 acima do corte de minutos são meias ofensivos, contra 9 de 24 no G6.</p></li>
+    </ol>
+  </div>
+
+  <div class="grid g4 kpis" id="kpis"></div>
 </div>
 
 <section id="contexto"><div class="wrap">
-  <h2>Contexto</h2>
+  <h2><span class="idx">01</span>Contexto</h2>
   <p class="sub">O Palmeiras foi campeão com 81 pontos, e Juventude, Avaí, Atlético-GO e Ceará foram rebaixados. A pergunta do trabalho é que características dos jogadores de linha diferenciam os seis primeiros colocados (G6, classificados para a fase de grupos da Libertadores) dos quatro rebaixados (Z4).</p>
   <div class="grid g2">
     <div class="card">
@@ -170,7 +223,7 @@ main,section{overflow-x:clip}
 </div></section>
 
 <section id="revisao"><div class="wrap">
-  <h2>Revisão do TCC: o que mudou e por quê</h2>
+  <h2><span class="idx">02</span>Revisão do TCC: o que mudou e por quê</h2>
   <p class="sub">Revisitando os scripts e as planilhas, encontrei cinco problemas. Os três primeiros mudam os resultados.</p>
   <div class="grid g2">
     <div class="card" id="fixes"></div>
@@ -200,7 +253,7 @@ main,section{overflow-x:clip}
 </div></section>
 
 <section id="metodo"><div class="wrap">
-  <h2>Método</h2>
+  <h2><span class="idx">03</span>Método</h2>
   <p class="sub">O mesmo roteiro de análise fatorial exploratória das aulas de Multivariada da UnB: verificar a adequação da amostra, escolher o número de fatores, rotacionar e calcular os escores.</p>
   <div class="steps">
     <div class="step"><b>Dados</b>Estatísticas individuais do FBref, Série A 2022, com os códigos de variáveis do TCC.</div>
@@ -214,7 +267,7 @@ main,section{overflow-x:clip}
 </div></section>
 
 <section id="painel"><div class="wrap">
-  <h2>Painel por posição</h2>
+  <h2><span class="idx">04</span>Painel por posição</h2>
   <p class="sub">Escolha um setor. Cada fator é uma combinação de estatísticas que costumam andar juntas, e o escore indica onde o jogador está em relação à média do setor (0 = média, 1 = um desvio-padrão acima).</p>
   <div class="tabs" role="tablist" id="tabs"></div>
 
@@ -273,7 +326,7 @@ main,section{overflow-x:clip}
 </div></section>
 
 <section id="conclusoes"><div class="wrap">
-  <h2>Conclusões</h2>
+  <h2><span class="idx">05</span>Conclusões</h2>
   <div class="grid g2">
     <div class="card concl">
       <h3>Achados</h3>
@@ -294,8 +347,8 @@ main,section{overflow-x:clip}
 </main>
 
 <footer><div class="wrap">
-  Dados: <a href="https://fbref.com/en/comps/24/2022/2022-Serie-A-Stats">FBref, Série A 2022</a>. Análise em Python (factor_analyzer, scipy); o TCC original foi feito em R (FactoMineR, psych).
-  Código e documento original: <a href="https://github.com/iagorf04178/TCC1">github.com/iagorf04178/TCC1</a>.
+  <span>Dados: <a href="https://fbref.com/en/comps/24/2022/2022-Serie-A-Stats">FBref, Série A 2022</a>. Análise em Python (factor_analyzer, scipy, scikit-learn); o TCC original foi feito em R (FactoMineR, psych).</span>
+  <span>Código e documento original: <a href="https://github.com/iagorf04178/TCC1">github.com/iagorf04178/TCC1</a></span>
 </div></footer>
 
 <div class="tt" id="tt" role="status" aria-live="polite"></div>
@@ -344,7 +397,7 @@ function ttLines(t, title, rows){t.appendChild(h("b",{text:title}));rows.forEach
 function kpis(){
   const P=DATA.posicoes; const n=POS.reduce((a,p)=>a+P[p].n_analise,0);
   const ve=POS.map(p=>P[p].var_exp.reduce((a,b)=>a+b,0)); const avg=ve.reduce((a,b)=>a+b,0)/ve.length;
-  const items=[["702","jogadores de linha no FBref","20 clubes · 3 setores"],[String(n),"analisados (mais de 1.180 min)","métricas por 90 minutos"],["3 × 3","fatores por setor","pela análise paralela de Horn"],[fmt(avg*100,0)+"%","da variância explicada (média)","contra 82% da PCA original*"]];
+  const items=[["702","jogadores de linha no FBref","20 clubes · 3 setores"],[String(n),"com mais de 1.180 minutos","métricas por 90 minutos"],["3 × 3","fatores por setor","pela análise paralela de Horn"],["7","funções táticas identificadas","por mistura gaussiana"]];
   const box=$("#kpis");
   items.forEach(([v,l,d])=>box.appendChild(h("div",{class:"card tile"},[h("div",{class:"v",text:v}),h("div",{class:"l",text:l}),h("div",{class:"d",text:d})])));
 }
