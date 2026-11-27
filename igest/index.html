@@ -5,135 +5,175 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Simulador IGEST, versão 2 · Francisco Iago</title>
 <meta name="description" content="Revisão do Simulador IGEST (TRT da 10ª Região, 2022): reimplementação fiel ao manual da CGJT, correções da versão em Shiny e simulador de cenários para qualquer vara do trabalho.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400..650&family=Geist+Mono:wght@400&display=swap" rel="stylesheet">
 <style>
+/* Sistema visual compartilhado com o portfólio e o TCC revisitado */
 :root{
   color-scheme:light;
-  --page:#f9f9f7; --surface:#fcfcfb; --surface-2:#f3f2ee;
-  --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781;
-  --grid:#e1e0d9; --axis:#c3c2b7; --ring:rgba(11,11,11,.10);
-  --real:#a9a79e; --sim:#2a78d6; --accent:#2a78d6;
-  --good:#1a8a5a; --bad:#d03b3b; --warn:#b26b00;
-  --q1:#1f4e8c; --q2:#b9d3f0; --q3:#c9c7bf;
+  --page:#F3EFE7; --surface:#FBF9F5; --surface-2:#ECE7DC;
+  --ink:#121A1C; --ink-2:#3A4447; --muted:#687174;
+  --grid:#E2DDD2; --axis:#C9C3B6; --ring:rgba(18,26,28,.12);
+  --real:#a9a497; --sim:#2a78d6; --accent:#1C6157; --link:#1C6157; --amber:#E8A33D;
+  --good:#1a7a4c; --bad:#c9412f; --warn:#a8650a;
+  --q1:#1f4e8c; --q2:#b9d3f0; --q3:#cdc7ba;
+  --serif:"Instrument Serif","Iowan Old Style","Times New Roman",serif;
+  --sans:"Geist",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"Geist Mono",ui-monospace,Menlo,monospace;
+  --ease-out:cubic-bezier(0.23,1,0.32,1);
 }
 @media (prefers-color-scheme:dark){
   :root:where(:not([data-theme="light"])){
     color-scheme:dark;
-    --page:#0d0d0d; --surface:#1a1a19; --surface-2:#232321;
-    --ink:#f0efec; --ink-2:#c3c2b7; --muted:#898781;
-    --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,.10);
-    --real:#6d6b65; --sim:#3987e5; --accent:#3987e5;
-    --good:#2fb57a; --bad:#e66767; --warn:#d99a2b;
-    --q1:#3c78c7; --q2:#26405f; --q3:#4a4945;
+    --page:#0B1315; --surface:#111C1F; --surface-2:#1A282C;
+    --ink:#ECE8DF; --ink-2:#B4BCBA; --muted:#7E8A88;
+    --grid:#1F2C2F; --axis:#33413F; --ring:rgba(255,255,255,.09);
+    --real:#5f6866; --sim:#3987e5; --accent:#5BC4A0; --link:#7fd3b6;
+    --good:#3fbf7f; --bad:#e66767; --warn:#d99a2b;
+    --q1:#3c78c7; --q2:#24415f; --q3:#3a4644;
   }
 }
 :root[data-theme="dark"]{
   color-scheme:dark;
-  --page:#0d0d0d; --surface:#1a1a19; --surface-2:#232321;
-  --ink:#f0efec; --ink-2:#c3c2b7; --muted:#898781;
-  --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,.10);
-  --real:#6d6b65; --sim:#3987e5; --accent:#3987e5;
-  --good:#2fb57a; --bad:#e66767; --warn:#d99a2b;
-  --q1:#3c78c7; --q2:#26405f; --q3:#4a4945;
+  --page:#0B1315; --surface:#111C1F; --surface-2:#1A282C;
+  --ink:#ECE8DF; --ink-2:#B4BCBA; --muted:#7E8A88;
+  --grid:#1F2C2F; --axis:#33413F; --ring:rgba(255,255,255,.09);
+  --real:#5f6866; --sim:#3987e5; --accent:#5BC4A0; --link:#7fd3b6;
+  --good:#3fbf7f; --bad:#e66767; --warn:#d99a2b;
+  --q1:#3c78c7; --q2:#24415f; --q3:#3a4644;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:72px}
-body{margin:0;background:var(--page);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
-a{color:var(--accent)}
-.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
-header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--page) 88%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--ring)}
-header.top .wrap{display:flex;align-items:center;gap:24px;height:56px}
-.brand{font-weight:650;font-size:14px;letter-spacing:.01em;text-decoration:none;color:inherit}
+body{margin:0;background:var(--page);color:var(--ink);font:15.5px/1.6 var(--sans);-webkit-font-smoothing:antialiased;font-feature-settings:"ss01"}
+::selection{background:var(--amber);color:#0B1315}
+a{color:var(--link);text-underline-offset:3px;text-decoration-thickness:1px}
+:focus-visible{outline:2px solid var(--amber);outline-offset:3px;border-radius:4px}
+code{font-family:var(--mono);font-size:.88em;background:var(--surface-2);padding:.08em .35em;border-radius:5px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 32px}
+
+/* cabeçalho */
+header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--page) 82%,transparent);-webkit-backdrop-filter:saturate(140%) blur(12px);backdrop-filter:saturate(140%) blur(12px);border-bottom:1px solid var(--ring)}
+header.top .wrap{display:flex;align-items:center;gap:20px;height:60px}
+.brand{font-weight:600;font-size:14.5px;letter-spacing:.01em;color:var(--ink);text-decoration:none;white-space:nowrap}
+.brand b{font-weight:600}
+.brand span{color:var(--amber)}
 nav.links{display:flex;gap:18px;margin-left:auto;font-size:13.5px}
-nav.links a{color:var(--ink-2);text-decoration:none}
-nav.links a:hover{color:var(--ink)}
-.btn-theme{border:1px solid var(--ring);background:var(--surface);color:var(--ink-2);border-radius:8px;padding:5px 10px;font:inherit;font-size:13px;cursor:pointer}
-.hero{padding-top:64px;padding-bottom:36px}
-.eyebrow{font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
-h1{font-size:clamp(30px,4.4vw,48px);line-height:1.08;letter-spacing:-.02em;margin:12px 0 16px;font-weight:700;max-width:900px;text-wrap:balance}
-.lede{font-size:18px;color:var(--ink-2);max-width:780px;margin:0}
-.byline{margin-top:22px;font-size:13.5px;color:var(--muted)}
-.byline b{color:var(--ink-2);font-weight:600}
-section{padding:44px 0;border-top:1px solid var(--ring)}
-h2{font-size:26px;letter-spacing:-.01em;margin:0 0 6px;font-weight:680}
-h3{font-size:16px;margin:0 0 4px;font-weight:650}
-.sub{color:var(--ink-2);margin:0 0 24px;max-width:800px}
-.card{background:var(--surface);border:1px solid var(--ring);border-radius:14px;padding:20px}
-.note{font-size:13px;color:var(--muted);margin:6px 0 0}
+nav.links a{color:var(--ink-2);text-decoration:none;transition:color .2s ease}
+.btn-theme{border:1px solid var(--ring);background:var(--surface);color:var(--ink-2);border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer;transition:transform 160ms var(--ease-out),background-color .2s ease}
+.btn-theme:active{transform:scale(.97)}
+@media (hover:hover) and (pointer:fine){nav.links a:hover{color:var(--ink)}.btn-theme:hover{background:var(--surface-2)}}
+
+/* abertura */
+.hero{padding-top:clamp(56px,8vw,104px);padding-bottom:28px}
+.eyebrow,.mono{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:400}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(52px,8.4vw,112px);line-height:.92;letter-spacing:-.028em;margin:18px 0 18px;max-width:1000px;text-wrap:balance}
+.subtitle{font-family:var(--serif);font-style:italic;font-size:clamp(24px,2.6vw,34px);line-height:1.15;color:var(--ink-2);margin:0 0 26px;max-width:880px;letter-spacing:-.01em;text-wrap:balance}
+.lede{font-size:18px;line-height:1.55;color:var(--ink-2);max-width:740px;margin:0;text-wrap:pretty}
+.byline{margin-top:24px;font-size:13.5px;color:var(--muted)}
+.byline b{color:var(--ink);font-weight:600}
+.answer{margin-top:clamp(40px,6vw,64px);border-top:1px solid var(--ink);padding-top:18px}
+.answer-hd{display:flex;justify-content:space-between;gap:16px;align-items:baseline;margin-bottom:20px}
+.answer-hd a{color:var(--muted);text-decoration:none}
+.answer ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px}
+.answer li{display:grid;gap:10px;align-content:start}
+.answer .k{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--muted)}
+.answer li b{font-family:var(--serif);font-weight:400;font-size:clamp(26px,2.4vw,32px);line-height:1.04;letter-spacing:-.012em;color:var(--ink)}
+.answer li p{margin:0;color:var(--ink-2);font-size:14.5px;text-wrap:pretty}
+
+/* seções */
+section{padding:clamp(56px,8vw,96px) 0;border-top:1px solid var(--ring)}
+h2{font-family:var(--serif);font-weight:400;font-size:clamp(38px,4.6vw,60px);line-height:.98;letter-spacing:-.022em;margin:0 0 14px;display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;text-wrap:balance}
+h2 .idx{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--muted);align-self:flex-start;margin-top:.5em}
+h3{font-size:15.5px;margin:0 0 4px;font-weight:600;letter-spacing:-.005em}
+.sub{color:var(--ink-2);margin:0 0 32px;max-width:780px;font-size:16.5px;text-wrap:pretty}
+.card{background:var(--surface);border:1px solid var(--ring);border-radius:16px;padding:22px}
+.note{font-size:13px;color:var(--muted);margin:6px 0 0;text-wrap:pretty}
 .grid{display:grid;gap:16px}
 .grid>*{min-width:0}
 .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .g3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .g4{grid-template-columns:repeat(4,minmax(0,1fr))}
 .g5{grid-template-columns:repeat(5,minmax(0,1fr))}
-.tile .v{font-size:34px;font-weight:680;letter-spacing:-.02em;line-height:1.1;font-variant-numeric:tabular-nums}
-.tile .l{font-size:13px;color:var(--ink-2);margin-top:4px}
+.tile{display:flex;flex-direction:column}
+.tile .v{font-family:var(--serif);font-size:44px;font-weight:400;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
+.tile .l{font-size:13.5px;color:var(--ink-2);margin-top:10px}
 .tile .d{font-size:12.5px;color:var(--muted);margin-top:2px}
-.fix{display:grid;grid-template-columns:28px 1fr;gap:12px;padding:16px 0;border-top:1px solid var(--ring)}
+.kpis.top{margin-top:36px}
+.kpis.top .tile{background:transparent;border:0;border-top:1px solid var(--ring);border-radius:0;padding:16px 0 0}
+.fix{display:grid;grid-template-columns:30px 1fr;gap:12px;padding:18px 0;border-top:1px solid var(--ring)}
 .fix:first-child{border-top:0;padding-top:0}
-.fix .n{width:26px;height:26px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-size:12.5px;font-weight:650;color:var(--ink-2)}
-.fix p{margin:4px 0 0;color:var(--ink-2);font-size:14px}
-.fix .tag{display:inline-block;font-size:11.5px;font-weight:600;padding:1px 8px;border-radius:99px;background:var(--surface-2);color:var(--ink-2);margin-left:6px;vertical-align:1px}
+.fix .n{width:28px;height:28px;border-radius:50%;border:1px solid var(--ring);display:grid;place-items:center;font-family:var(--mono);font-size:12px;color:var(--ink-2)}
+.fix b{font-weight:600}
+.fix p{margin:6px 0 0;color:var(--ink-2);font-size:14.5px}
+.fix .tag{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:99px;background:var(--surface-2);color:var(--ink-2);margin-left:8px;vertical-align:2px}
 .fix .tag.hi{background:color-mix(in srgb,var(--bad) 14%,transparent);color:var(--bad)}
-.steps{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;counter-reset:s}
-.step{background:var(--surface);border:1px solid var(--ring);border-radius:12px;padding:14px;font-size:13px;color:var(--ink-2)}
-.step b{display:block;color:var(--ink);font-size:13.5px;margin-bottom:4px}
-.step b::before{counter-increment:s;content:counter(s) " · ";color:var(--muted);font-weight:500}
+.steps{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));counter-reset:s;border-top:1px solid var(--ink)}
+.step{padding:16px 16px 4px;font-size:13.5px;color:var(--ink-2);border-right:1px solid var(--ring)}
+.step:first-child{padding-left:0}
+.step:last-child{border-right:0}
+.step b{display:block;color:var(--ink);font-family:var(--serif);font-weight:400;font-size:22px;line-height:1.1;margin-bottom:8px}
+.step b::before{counter-increment:s;content:counter(s,decimal-leading-zero);display:block;font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:10px;letter-spacing:.06em}
 .meso-card{display:flex;flex-direction:column;gap:6px}
-.meso-card .w{font-size:12px;color:var(--muted);font-weight:600}
-.meso-card ul{margin:4px 0 0;padding:0;list-style:none;font-size:13px;color:var(--ink-2)}
-.meso-card li{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-top:1px dashed var(--grid)}
-.meso-card li:first-child{border-top:0}
-.pol{font-size:11px;font-weight:650;border-radius:99px;padding:0 6px;white-space:nowrap}
+.meso-card h3{font-family:var(--serif);font-weight:400;font-size:26px;line-height:1.05;letter-spacing:-.01em}
+.meso-card .w{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.meso-card ul{margin:6px 0 0;padding:0;list-style:none;font-size:13px;color:var(--ink-2)}
+.meso-card li{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-top:1px solid var(--grid)}
+.pol{font-family:var(--mono);font-size:10.5px;border-radius:99px;padding:1px 7px;white-space:nowrap;align-self:center}
 .pol.p{color:var(--good);background:color-mix(in srgb,var(--good) 12%,transparent)}
 .pol.n{color:var(--muted);background:var(--surface-2)}
 table{border-collapse:collapse;width:100%;font-size:13.5px;font-variant-numeric:tabular-nums}
-th{font-size:12px;font-weight:600;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--axis);white-space:nowrap}
-td{padding:7px 10px;border-bottom:1px solid var(--grid);color:var(--ink-2)}
-td.name{color:var(--ink);font-weight:550}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;font-weight:400;color:var(--muted);text-align:left;padding:9px 10px;border-bottom:1px solid var(--axis);white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid var(--grid);color:var(--ink-2)}
+td.name{color:var(--ink);font-weight:500}
 td.r,th.r{text-align:right}
 tr.hl td{background:color-mix(in srgb,var(--sim) 10%,var(--surface))}
 tr.hl td.name{color:var(--sim)}
 .tscroll{overflow-x:auto}
 svg{display:block;overflow:visible}
-svg text{fill:var(--muted);font-size:11.5px;font-family:inherit}
+svg text{fill:var(--muted);font-size:11.5px;font-family:var(--sans)}
 svg .ink{fill:var(--ink)} svg .ink2{fill:var(--ink-2)}
 .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-2)}
 .legend span{display:inline-flex;align-items:center;gap:6px}
-.legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
-.concl li{margin:0 0 10px;color:var(--ink-2)}
-.concl li b{color:var(--ink)}
-footer{padding:40px 0 60px;color:var(--muted);font-size:13px;border-top:1px solid var(--ring)}
-.tt{position:fixed;pointer-events:none;z-index:50;background:var(--surface);border:1px solid var(--ring);box-shadow:0 6px 24px rgba(0,0,0,.14);border-radius:10px;padding:8px 10px;font-size:12.5px;color:var(--ink-2);opacity:0;transition:opacity .08s;max-width:280px}
+.legend i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.concl ul{padding-left:0!important;list-style:none}
+.concl li{margin:0;padding:14px 0;border-top:1px solid var(--ring);color:var(--ink-2)}
+.concl li:first-child{border-top:0;padding-top:4px}
+.concl li b{color:var(--ink);font-weight:600}
+footer{padding:44px 0 72px;color:var(--muted);font-size:13.5px;border-top:1px solid var(--ring)}
+.tt{position:fixed;pointer-events:none;z-index:50;background:var(--surface);border:1px solid var(--ring);box-shadow:0 10px 30px -8px rgba(0,0,0,.25);border-radius:12px;padding:10px 12px;font-size:12.5px;color:var(--ink-2);opacity:0;transition:opacity .1s ease;max-width:280px}
 .tt b{color:var(--ink)}
 .sr{position:absolute;left:-9999px}
+main,section{overflow-x:clip}
 
 /* ---------- simulador ---------- */
 .sim{display:grid;grid-template-columns:360px minmax(0,1fr);gap:16px;align-items:start}
 .sim>*,.field,.panel-hd>*{min-width:0}
 select{min-width:0;max-width:100%;text-overflow:ellipsis}
-.panel{position:sticky;top:72px;max-height:calc(100vh - 88px);display:flex;flex-direction:column;padding:0;overflow:hidden}
+.panel{position:sticky;top:76px;max-height:calc(100vh - 88px);display:flex;flex-direction:column;padding:0;overflow:hidden}
 .panel-hd{padding:16px 16px 12px;border-bottom:1px solid var(--ring);display:grid;gap:10px}
 .panel-bd{overflow-y:auto;padding:4px 16px 16px;overscroll-behavior:contain}
 .field{display:grid;gap:4px}
-.field>span{font-size:12px;color:var(--muted);font-weight:600}
-select,input[type=number]{font:inherit;font-size:13.5px;background:var(--surface);color:var(--ink);border:1px solid var(--ring);border-radius:8px;padding:6px 10px;width:100%}
+.field>span{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+select,input[type=number]{font:inherit;font-size:13.5px;background:var(--surface);color:var(--ink);border:1px solid var(--ring);border-radius:10px;padding:7px 10px;width:100%}
 input[type=number]{font-variant-numeric:tabular-nums;padding:4px 8px;width:110px;text-align:right}
-.seg{display:flex;gap:3px;background:var(--surface-2);padding:3px;border-radius:10px}
-.seg button{flex:1;border:0;background:transparent;color:var(--ink-2);font:inherit;font-size:12.5px;font-weight:550;padding:6px 6px;border-radius:7px;cursor:pointer;white-space:nowrap}
+.seg{display:flex;gap:3px;background:var(--surface-2);padding:3px;border-radius:999px;border:1px solid var(--ring)}
+.seg button{flex:1;border:0;background:transparent;color:var(--ink-2);font:inherit;font-size:12.5px;font-weight:500;padding:6px 6px;border-radius:999px;cursor:pointer;white-space:nowrap;transition:color .2s ease,background-color .2s ease,transform 160ms var(--ease-out)}
+.seg button:active{transform:scale(.97)}
 .seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--ring)}
 .chk{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--ink-2);cursor:pointer}
 .chk input{margin-top:3px}
 .presets{display:flex;flex-wrap:wrap;gap:6px}
 .chip{border:1px solid var(--ring);background:var(--surface);color:var(--ink-2);font:inherit;font-size:12.5px;padding:4px 10px;border-radius:99px;cursor:pointer;transition:background-color .15s ease,transform .12s ease}
-.chip:hover{background:var(--surface-2);color:var(--ink)}
+@media (hover:hover) and (pointer:fine){.chip:hover{background:var(--surface-2);color:var(--ink)}}
 .chip:active{transform:scale(.97)}
 .chip.reset{color:var(--accent)}
 .vgroup{margin-top:14px}
-.vgroup>h4{margin:0 0 2px;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:650}
+.vgroup>h4{margin:0 0 2px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:400}
 .var{padding:10px 0;border-top:1px solid var(--grid)}
 .var:first-of-type{border-top:0}
 .var .vh{display:flex;align-items:baseline;gap:8px}
-.var .code{font-size:11.5px;font-weight:650;color:var(--muted);font-variant-numeric:tabular-nums}
+.var .code{font-family:var(--mono);font-size:11px;color:var(--muted)}
 .var label{font-size:13px;color:var(--ink);flex:1}
 .eff{font-size:11px;font-weight:600;white-space:nowrap}
 .eff.up-bad{color:var(--bad)} .eff.up-good{color:var(--good)} .eff.none{color:var(--muted)}
@@ -145,11 +185,11 @@ input[type=number]{font-variant-numeric:tabular-nums;padding:4px 8px;width:110px
 .delta.up{color:var(--ink-2)} .delta.zero{color:var(--muted);font-weight:500}
 .var .rst{border:0;background:none;color:var(--accent);font:inherit;font-size:12px;cursor:pointer;padding:0;visibility:hidden}
 .var.changed .rst{visibility:visible}
-.results{display:grid;gap:16px}
-.kpi .v{font-size:30px}
+.results{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+.kpi .v{font-size:40px}
 .kpi .cmp{font-size:12.5px;color:var(--muted);margin-top:2px;font-variant-numeric:tabular-nums}
 .kpi .cmp b.good{color:var(--good)} .kpi .cmp b.bad{color:var(--bad)}
-.band{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;padding:2px 10px;border-radius:99px}
+.band{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);letter-spacing:0;font-size:12.5px;font-weight:600;padding:2px 10px;border-radius:99px}
 .band.b0{background:var(--q1);color:#fff}
 .band.b1{background:var(--q2);color:var(--ink)}
 .band.b2{background:var(--q3);color:var(--ink)}
@@ -168,32 +208,39 @@ input[type=number]{font-variant-numeric:tabular-nums;padding:4px 8px;width:110px
   .sim{grid-template-columns:1fr}
   .panel{position:static;max-height:none}
   .panel-bd{max-height:60vh}
-  .steps{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
-@media (max-width:900px){.g2,.g3,.g4,.g5{grid-template-columns:1fr}nav.links{display:none}.kpis.g4{grid-template-columns:1fr 1fr}}
-@media (max-width:600px){.wrap{padding:0 16px}h1{font-size:28px}.steps{grid-template-columns:1fr 1fr}.lever{grid-template-columns:1fr auto}.lever .barw{display:none}}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.chip{transition:none}}
+@media (max-width:960px){.g2,.g3,.g4,.g5{grid-template-columns:1fr}nav.links{display:none}.kpis.g4{grid-template-columns:1fr 1fr}.answer ol{grid-template-columns:1fr;gap:24px}.steps{grid-template-columns:1fr 1fr}.step,.step:first-child{padding:14px 12px 12px 0;border-right:0;border-bottom:1px solid var(--ring)}}
+@media (max-width:640px){.wrap{padding:0 18px}.lever{grid-template-columns:1fr auto}.lever .barw{display:none}.tile .v,.kpi .v{font-size:36px}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
 </style>
 </head>
 <body>
 <header class="top"><div class="wrap">
-  <a class="brand" href="../index.html#trajetoria">Francisco Iago · Portfólio</a>
-  <nav class="links">
-    <a href="#contexto">O IGEST</a><a href="#revisao">Revisão da v1</a><a href="#metodo">Método</a><a href="#simulador">Simulador</a><a href="#conclusoes">Conclusões</a>
+  <a class="brand" href="../index.html#trajetoria"><b>Francisco Iago</b><span>.</span></a>
+  <nav class="links" aria-label="Seções">
+    <a href="#contexto">O IGEST</a><a href="#revisao">Revisão</a><a href="#metodo">Método</a><a href="#simulador">Simulador</a><a href="#conclusoes">Conclusões</a>
   </nav>
   <button class="btn-theme" id="themeBtn" type="button">Tema</button>
 </div></header>
 
 <main>
 <div class="wrap hero">
-  <div class="eyebrow">Projeto revisitado · TRT da 10ª Região · Shiny 2022 → web 2026</div>
-  <h1>Simulador do IGEST, versão 2: o que muda no ranking de uma vara quando a gestão muda</h1>
+  <div class="eyebrow">Projeto revisitado · TRT da 10ª Região · versão 2 · Shiny 2022 → web 2026</div>
+  <h1>Simulador do IGEST</h1>
+  <p class="subtitle">O que muda no ranking de uma vara do trabalho quando a gestão muda</p>
   <p class="lede">Revisão do simulador que fiz em R/Shiny no TRT-10. Reimplementei o cálculo seguindo o manual da Corregedoria-Geral da Justiça do Trabalho, corrigi divergências e erros da primeira versão e levei o simulador para o navegador: agora qualquer vara dos 24 TRTs pode ser simulada, comparada por tribunal ou por faixa de movimentação, e o painel indica onde agir.</p>
   <div class="byline"><b>Francisco Iago dos Reis Ferreira</b> · versão 1: 2022, estágio na Divisão de Gestão Estratégica do TRT-10 · revisão: nov/2026 · metodologia: Manual de Uso do IGEST (CGJT)</div>
-</div>
 
-<div class="wrap">
-  <div class="grid g4 kpis">
+  <div class="answer">
+    <div class="answer-hd"><span class="mono">O que a revisão encontrou</span><a class="mono" href="#simulador">abrir o simulador ↓</a></div>
+    <ol>
+      <li><span class="k">01</span><b>Um detalhe de código mudava o ranking.</b><p>A v1 truncava em zero o limite inferior do boxplot, o que o manual não prevê. Corrigido, 62 varas mudam de faixa e 146 andam mais de 50 posições.</p></li>
+      <li><span class="k">02</span><b>O índice premia proporção, não volume.</b><p>Receber mais processos ou iniciar mais execuções piora o IGEST se as soluções não acompanharem. A v1 indicava esses sinais ao contrário.</p></li>
+      <li><span class="k">03</span><b>O grupo de comparação muda a história.</b><p>A mesma vara pode ficar na faixa intermediária do país e entre as 25% melhores do próprio TRT.</p></li>
+    </ol>
+  </div>
+
+  <div class="grid g4 kpis top">
     <div class="card tile"><div class="v">1.569</div><div class="l">varas do trabalho na base</div><div class="d">24 TRTs · 17 variáveis por vara</div></div>
     <div class="card tile"><div class="v">5</div><div class="l">problemas corrigidos na v1</div><div class="d">3 de cálculo e 2 de interface</div></div>
     <div class="card tile"><div class="v">62</div><div class="l">varas mudam de faixa</div><div class="d">entre 25% melhores, 50% intermediárias e 25% piores</div></div>
@@ -203,7 +250,7 @@ input[type=number]{font-variant-numeric:tabular-nums;padding:4px 8px;width:110px
 
 <!-- ============ CONTEXTO ============ -->
 <section id="contexto"><div class="wrap">
-  <h2>O que é o IGEST</h2>
+  <h2><span class="idx">01</span>O que é o IGEST</h2>
   <p class="sub">O Índice Nacional de Gestão do Desempenho da Justiça do Trabalho resume 17 variáveis do e-Gestão em 13 indicadores, agrupados em 5 mesoindicadores de peso igual. Cada indicador é padronizado entre 0 e 1 pelos limites do boxplot das varas comparadas. <b>Quanto mais perto de 0, melhor.</b></p>
   <div class="grid g5" id="mesoCards"></div>
   <div class="card" style="margin-top:16px">
@@ -214,7 +261,7 @@ input[type=number]{font-variant-numeric:tabular-nums;padding:4px 8px;width:110px
 
 <!-- ============ REVISÃO ============ -->
 <section id="revisao"><div class="wrap">
-  <h2>Revisão da versão 1: o que mudou e por quê</h2>
+  <h2><span class="idx">02</span>Revisão da versão 1: o que mudou e por quê</h2>
   <p class="sub">Reescrevi o cálculo do app em Python, reproduzi os resultados da versão em Shiny e comparei cada passo com o manual. Encontrei cinco problemas. O primeiro sozinho muda a faixa de 62 varas.</p>
   <div class="grid g2">
     <div class="card">
@@ -258,7 +305,7 @@ input[type=number]{font-variant-numeric:tabular-nums;padding:4px 8px;width:110px
 
 <!-- ============ MÉTODO ============ -->
 <section id="metodo"><div class="wrap">
-  <h2>Método</h2>
+  <h2><span class="idx">03</span>Método</h2>
   <p class="sub">Primeiro reproduzi a v1 exatamente, depois apliquei uma correção por vez para medir o efeito de cada uma.</p>
   <div class="steps">
     <div class="step"><b>Dados</b>17 variáveis de 1.569 varas (arquivo.xlsx do repositório original), com o TRT de cada linha.</div>
@@ -272,7 +319,7 @@ input[type=number]{font-variant-numeric:tabular-nums;padding:4px 8px;width:110px
 
 <!-- ============ SIMULADOR ============ -->
 <section id="simulador"><div class="wrap">
-  <h2>Simulador</h2>
+  <h2><span class="idx">04</span>Simulador</h2>
   <p class="sub">Escolha uma vara, altere as variáveis e veja o IGEST, a posição e os mesoindicadores recalculados. A vara simulada entra no grupo de comparação no lugar da original, e os limites do boxplot são recalculados a cada mudança, como no índice oficial.</p>
 
   <div class="sim">
@@ -345,7 +392,7 @@ input[type=number]{font-variant-numeric:tabular-nums;padding:4px 8px;width:110px
 
 <!-- ============ CONCLUSÕES ============ -->
 <section id="conclusoes"><div class="wrap">
-  <h2>Conclusões</h2>
+  <h2><span class="idx">05</span>Conclusões</h2>
   <div class="grid g2">
     <div class="card"><ul class="concl" style="padding-left:18px;margin:0">
       <li><b>Um detalhe de implementação pesa mais que qualquer cenário.</b> Truncar o limite inferior em zero mudou a nota média em 0,063 ponto, mais do que a maioria dos cenários de gestão que o app foi feito para testar.</li>
@@ -489,7 +536,7 @@ const FAIXAS=["até 500","501 a 750","751 a 1.000","1.001 a 1.500","1.501 a 2.00
 const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 
 /* ---------- cartões dos mesoindicadores ---------- */
-$("#mesoCards").innerHTML=MESOS.map(([m,ps])=>`<div class="card meso-card"><span class="w">peso 0,2</span><h3>${m}</h3><ul>${ps.map(([k,w])=>`<li><span>${IND[k][0]} · ${IND[k][1]}</span><span class="pol ${POS.has(k)?"p":"n"}">${F[1].format(w)} ${POS.has(k)?"↑":"↓"}</span></li>`).join("")}</ul></div>`).join("");
+$("#mesoCards").innerHTML=MESOS.map(([m,ps],i)=>`<div class="card meso-card"><span class="w">M0${i+1} · peso 0,2</span><h3>${m}</h3><ul>${ps.map(([k,w])=>`<li><span>${IND[k][0]} · ${IND[k][1]}</span><span class="pol ${POS.has(k)?"p":"n"}">${F[1].format(w)} ${POS.has(k)?"↑":"↓"}</span></li>`).join("")}</ul></div>`).join("");
 
 /* ---------- gráfico v1 × v2 (nacional) ---------- */
 const TODOS=[...Array(N).keys()];
