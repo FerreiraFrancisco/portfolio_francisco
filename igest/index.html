@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulador IGEST, versão 2 · Francisco Iago</title>
+<meta name="description" content="Revisão do Simulador IGEST (TRT da 10ª Região, 2022): reimplementação fiel ao manual da CGJT, correções da versão em Shiny e simulador de cenários para qualquer vara do trabalho.">
+<style>
+:root{
+  color-scheme:light;
+  --page:#f9f9f7; --surface:#fcfcfb; --surface-2:#f3f2ee;
+  --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --ring:rgba(11,11,11,.10);
+  --real:#a9a79e; --sim:#2a78d6; --accent:#2a78d6;
+  --good:#1a8a5a; --bad:#d03b3b; --warn:#b26b00;
+  --q1:#1f4e8c; --q2:#b9d3f0; --q3:#c9c7bf;
+}
+@media (prefers-color-scheme:dark){
+  :root:where(:not([data-theme="light"])){
+    color-scheme:dark;
+    --page:#0d0d0d; --surface:#1a1a19; --surface-2:#232321;
+    --ink:#f0efec; --ink-2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,.10);
+    --real:#6d6b65; --sim:#3987e5; --accent:#3987e5;
+    --good:#2fb57a; --bad:#e66767; --warn:#d99a2b;
+    --q1:#3c78c7; --q2:#26405f; --q3:#4a4945;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --page:#0d0d0d; --surface:#1a1a19; --surface-2:#232321;
+  --ink:#f0efec; --ink-2:#c3c2b7; --muted:#898781;
+  --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,.10);
+  --real:#6d6b65; --sim:#3987e5; --accent:#3987e5;
+  --good:#2fb57a; --bad:#e66767; --warn:#d99a2b;
+  --q1:#3c78c7; --q2:#26405f; --q3:#4a4945;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--page);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--accent)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--page) 88%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--ring)}
+header.top .wrap{display:flex;align-items:center;gap:24px;height:56px}
+.brand{font-weight:650;font-size:14px;letter-spacing:.01em;text-decoration:none;color:inherit}
+nav.links{display:flex;gap:18px;margin-left:auto;font-size:13.5px}
+nav.links a{color:var(--ink-2);text-decoration:none}
+nav.links a:hover{color:var(--ink)}
+.btn-theme{border:1px solid var(--ring);background:var(--surface);color:var(--ink-2);border-radius:8px;padding:5px 10px;font:inherit;font-size:13px;cursor:pointer}
+.hero{padding-top:64px;padding-bottom:36px}
+.eyebrow{font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1{font-size:clamp(30px,4.4vw,48px);line-height:1.08;letter-spacing:-.02em;margin:12px 0 16px;font-weight:700;max-width:900px;text-wrap:balance}
+.lede{font-size:18px;color:var(--ink-2);max-width:780px;margin:0}
+.byline{margin-top:22px;font-size:13.5px;color:var(--muted)}
+.byline b{color:var(--ink-2);font-weight:600}
+section{padding:44px 0;border-top:1px solid var(--ring)}
+h2{font-size:26px;letter-spacing:-.01em;margin:0 0 6px;font-weight:680}
+h3{font-size:16px;margin:0 0 4px;font-weight:650}
+.sub{color:var(--ink-2);margin:0 0 24px;max-width:800px}
+.card{background:var(--surface);border:1px solid var(--ring);border-radius:14px;padding:20px}
+.note{font-size:13px;color:var(--muted);margin:6px 0 0}
+.grid{display:grid;gap:16px}
+.grid>*{min-width:0}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.tile .v{font-size:34px;font-weight:680;letter-spacing:-.02em;line-height:1.1;font-variant-numeric:tabular-nums}
+.tile .l{font-size:13px;color:var(--ink-2);margin-top:4px}
+.tile .d{font-size:12.5px;color:var(--muted);margin-top:2px}
+.fix{display:grid;grid-template-columns:28px 1fr;gap:12px;padding:16px 0;border-top:1px solid var(--ring)}
+.fix:first-child{border-top:0;padding-top:0}
+.fix .n{width:26px;height:26px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-size:12.5px;font-weight:650;color:var(--ink-2)}
+.fix p{margin:4px 0 0;color:var(--ink-2);font-size:14px}
+.fix .tag{display:inline-block;font-size:11.5px;font-weight:600;padding:1px 8px;border-radius:99px;background:var(--surface-2);color:var(--ink-2);margin-left:6px;vertical-align:1px}
+.fix .tag.hi{background:color-mix(in srgb,var(--bad) 14%,transparent);color:var(--bad)}
+.steps{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;counter-reset:s}
+.step{background:var(--surface);border:1px solid var(--ring);border-radius:12px;padding:14px;font-size:13px;color:var(--ink-2)}
+.step b{display:block;color:var(--ink);font-size:13.5px;margin-bottom:4px}
+.step b::before{counter-increment:s;content:counter(s) " · ";color:var(--muted);font-weight:500}
+.meso-card{display:flex;flex-direction:column;gap:6px}
+.meso-card .w{font-size:12px;color:var(--muted);font-weight:600}
+.meso-card ul{margin:4px 0 0;padding:0;list-style:none;font-size:13px;color:var(--ink-2)}
+.meso-card li{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-top:1px dashed var(--grid)}
+.meso-card li:first-child{border-top:0}
+.pol{font-size:11px;font-weight:650;border-radius:99px;padding:0 6px;white-space:nowrap}
+.pol.p{color:var(--good);background:color-mix(in srgb,var(--good) 12%,transparent)}
+.pol.n{color:var(--muted);background:var(--surface-2)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;font-variant-numeric:tabular-nums}
+th{font-size:12px;font-weight:600;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--axis);white-space:nowrap}
+td{padding:7px 10px;border-bottom:1px solid var(--grid);color:var(--ink-2)}
+td.name{color:var(--ink);font-weight:550}
+td.r,th.r{text-align:right}
+tr.hl td{background:color-mix(in srgb,var(--sim) 10%,var(--surface))}
+tr.hl td.name{color:var(--sim)}
+.tscroll{overflow-x:auto}
+svg{display:block;overflow:visible}
+svg text{fill:var(--muted);font-size:11.5px;font-family:inherit}
+svg .ink{fill:var(--ink)} svg .ink2{fill:var(--ink-2)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.concl li{margin:0 0 10px;color:var(--ink-2)}
+.concl li b{color:var(--ink)}
+footer{padding:40px 0 60px;color:var(--muted);font-size:13px;border-top:1px solid var(--ring)}
+.tt{position:fixed;pointer-events:none;z-index:50;background:var(--surface);border:1px solid var(--ring);box-shadow:0 6px 24px rgba(0,0,0,.14);border-radius:10px;padding:8px 10px;font-size:12.5px;color:var(--ink-2);opacity:0;transition:opacity .08s;max-width:280px}
+.tt b{color:var(--ink)}
+.sr{position:absolute;left:-9999px}
+
+/* ---------- simulador ---------- */
+.sim{display:grid;grid-template-columns:360px minmax(0,1fr);gap:16px;align-items:start}
+.sim>*,.field,.panel-hd>*{min-width:0}
+select{min-width:0;max-width:100%;text-overflow:ellipsis}
+.panel{position:sticky;top:72px;max-height:calc(100vh - 88px);display:flex;flex-direction:column;padding:0;overflow:hidden}
+.panel-hd{padding:16px 16px 12px;border-bottom:1px solid var(--ring);display:grid;gap:10px}
+.panel-bd{overflow-y:auto;padding:4px 16px 16px;overscroll-behavior:contain}
+.field{display:grid;gap:4px}
+.field>span{font-size:12px;color:var(--muted);font-weight:600}
+select,input[type=number]{font:inherit;font-size:13.5px;background:var(--surface);color:var(--ink);border:1px solid var(--ring);border-radius:8px;padding:6px 10px;width:100%}
+input[type=number]{font-variant-numeric:tabular-nums;padding:4px 8px;width:110px;text-align:right}
+.seg{display:flex;gap:3px;background:var(--surface-2);padding:3px;border-radius:10px}
+.seg button{flex:1;border:0;background:transparent;color:var(--ink-2);font:inherit;font-size:12.5px;font-weight:550;padding:6px 6px;border-radius:7px;cursor:pointer;white-space:nowrap}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--ring)}
+.chk{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--ink-2);cursor:pointer}
+.chk input{margin-top:3px}
+.presets{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--ring);background:var(--surface);color:var(--ink-2);font:inherit;font-size:12.5px;padding:4px 10px;border-radius:99px;cursor:pointer;transition:background-color .15s ease,transform .12s ease}
+.chip:hover{background:var(--surface-2);color:var(--ink)}
+.chip:active{transform:scale(.97)}
+.chip.reset{color:var(--accent)}
+.vgroup{margin-top:14px}
+.vgroup>h4{margin:0 0 2px;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:650}
+.var{padding:10px 0;border-top:1px solid var(--grid)}
+.var:first-of-type{border-top:0}
+.var .vh{display:flex;align-items:baseline;gap:8px}
+.var .code{font-size:11.5px;font-weight:650;color:var(--muted);font-variant-numeric:tabular-nums}
+.var label{font-size:13px;color:var(--ink);flex:1}
+.eff{font-size:11px;font-weight:600;white-space:nowrap}
+.eff.up-bad{color:var(--bad)} .eff.up-good{color:var(--good)} .eff.none{color:var(--muted)}
+.var .vc{display:flex;align-items:center;gap:10px;margin-top:6px}
+.var input[type=range]{flex:1;accent-color:var(--sim);min-width:0}
+.var .vf{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted);margin-top:2px;font-variant-numeric:tabular-nums}
+.var .delta{font-weight:650}
+.var.changed .code{color:var(--sim)}
+.delta.up{color:var(--ink-2)} .delta.zero{color:var(--muted);font-weight:500}
+.var .rst{border:0;background:none;color:var(--accent);font:inherit;font-size:12px;cursor:pointer;padding:0;visibility:hidden}
+.var.changed .rst{visibility:visible}
+.results{display:grid;gap:16px}
+.kpi .v{font-size:30px}
+.kpi .cmp{font-size:12.5px;color:var(--muted);margin-top:2px;font-variant-numeric:tabular-nums}
+.kpi .cmp b.good{color:var(--good)} .kpi .cmp b.bad{color:var(--bad)}
+.band{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;padding:2px 10px;border-radius:99px}
+.band.b0{background:var(--q1);color:#fff}
+.band.b1{background:var(--q2);color:var(--ink)}
+.band.b2{background:var(--q3);color:var(--ink)}
+.alerts{display:grid;gap:8px}
+.alert{font-size:13px;padding:10px 12px;border-radius:10px;border:1px solid color-mix(in srgb,var(--warn) 35%,transparent);background:color-mix(in srgb,var(--warn) 8%,var(--surface));color:var(--ink-2)}
+.alert b{color:var(--ink)}
+.lever{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) auto;gap:10px;align-items:center;padding:7px 0;border-top:1px solid var(--grid);font-size:13px}
+.lever:first-child{border-top:0}
+.lever .nm{color:var(--ink)}
+.lever .nm small{color:var(--muted);display:block;font-size:11.5px}
+.lever .bar{height:8px;border-radius:0 4px 4px 0;background:var(--good);opacity:.85}
+.lever .val{font-variant-numeric:tabular-nums;color:var(--ink-2);font-size:12.5px;text-align:right;white-space:nowrap}
+.lever button{font-size:12px;padding:3px 9px}
+.empty{font-size:13px;color:var(--muted)}
+@media (max-width:1000px){
+  .sim{grid-template-columns:1fr}
+  .panel{position:static;max-height:none}
+  .panel-bd{max-height:60vh}
+  .steps{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:900px){.g2,.g3,.g4,.g5{grid-template-columns:1fr}nav.links{display:none}.kpis.g4{grid-template-columns:1fr 1fr}}
+@media (max-width:600px){.wrap{padding:0 16px}h1{font-size:28px}.steps{grid-template-columns:1fr 1fr}.lever{grid-template-columns:1fr auto}.lever .barw{display:none}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.chip{transition:none}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../index.html#trajetoria">Francisco Iago · Portfólio</a>
+  <nav class="links">
+    <a href="#contexto">O IGEST</a><a href="#revisao">Revisão da v1</a><a href="#metodo">Método</a><a href="#simulador">Simulador</a><a href="#conclusoes">Conclusões</a>
+  </nav>
+  <button class="btn-theme" id="themeBtn" type="button">Tema</button>
+</div></header>
+
+<main>
+<div class="wrap hero">
+  <div class="eyebrow">Projeto revisitado · TRT da 10ª Região · Shiny 2022 → web 2026</div>
+  <h1>Simulador do IGEST, versão 2: o que muda no ranking de uma vara quando a gestão muda</h1>
+  <p class="lede">Revisão do simulador que fiz em R/Shiny no TRT-10. Reimplementei o cálculo seguindo o manual da Corregedoria-Geral da Justiça do Trabalho, corrigi divergências e erros da primeira versão e levei o simulador para o navegador: agora qualquer vara dos 24 TRTs pode ser simulada, comparada por tribunal ou por faixa de movimentação, e o painel indica onde agir.</p>
+  <div class="byline"><b>Francisco Iago dos Reis Ferreira</b> · versão 1: 2022, estágio na Divisão de Gestão Estratégica do TRT-10 · revisão: nov/2026 · metodologia: Manual de Uso do IGEST (CGJT)</div>
+</div>
+
+<div class="wrap">
+  <div class="grid g4 kpis">
+    <div class="card tile"><div class="v">1.569</div><div class="l">varas do trabalho na base</div><div class="d">24 TRTs · 17 variáveis por vara</div></div>
+    <div class="card tile"><div class="v">5</div><div class="l">problemas corrigidos na v1</div><div class="d">3 de cálculo e 2 de interface</div></div>
+    <div class="card tile"><div class="v">62</div><div class="l">varas mudam de faixa</div><div class="d">entre 25% melhores, 50% intermediárias e 25% piores</div></div>
+    <div class="card tile"><div class="v">146</div><div class="l">varas andam mais de 50 posições</div><div class="d">no ranking nacional, da v1 para a v2</div></div>
+  </div>
+</div>
+
+<!-- ============ CONTEXTO ============ -->
+<section id="contexto"><div class="wrap">
+  <h2>O que é o IGEST</h2>
+  <p class="sub">O Índice Nacional de Gestão do Desempenho da Justiça do Trabalho resume 17 variáveis do e-Gestão em 13 indicadores, agrupados em 5 mesoindicadores de peso igual. Cada indicador é padronizado entre 0 e 1 pelos limites do boxplot das varas comparadas. <b>Quanto mais perto de 0, melhor.</b></p>
+  <div class="grid g5" id="mesoCards"></div>
+  <div class="card" style="margin-top:16px">
+    <h3>Padronização pelo boxplot</h3>
+    <p class="note" style="margin-top:4px">Para cada indicador: LI = Q1 − 1,5·(Q3 − Q1) e LS = Q3 + 1,5·(Q3 − Q1). Abaixo de LI a nota é 0; acima de LS, 1; entre os dois, (x − LI)/(LS − LI). Nos indicadores de polaridade positiva (mais é melhor) a nota é invertida: 1 − (x − LI)/(LS − LI). IGEST = 0,2 × (Acervo + Celeridade + Produtividade + Congestionamento + Força de trabalho).</p>
+  </div>
+</div></section>
+
+<!-- ============ REVISÃO ============ -->
+<section id="revisao"><div class="wrap">
+  <h2>Revisão da versão 1: o que mudou e por quê</h2>
+  <p class="sub">Reescrevi o cálculo do app em Python, reproduzi os resultados da versão em Shiny e comparei cada passo com o manual. Encontrei cinco problemas. O primeiro sozinho muda a faixa de 62 varas.</p>
+  <div class="grid g2">
+    <div class="card">
+      <div class="fix"><div class="n">1</div><div><b>Limite inferior truncado em zero</b><span class="tag hi">muda o ranking</span>
+        <p>O código fazia <code>if (LI &lt; 0) LI = 0</code>. O manual não prevê isso: o limite é Q1 − 1,5·IQR, mesmo negativo. Nesta base os 13 indicadores têm LI negativo, então todas as notas mudavam de escala. A v2 segue o manual, e a chave “Regras da versão 1” no simulador reproduz o comportamento antigo para comparação.</p></div></div>
+      <div class="fix"><div class="n">2</div><div><b>Divisão por zero virava nota máxima</b><span class="tag">cálculo</span>
+        <p>Quando não há processos conclusos (V12 = 0), I03 = 0/0. No R isso vira <code>NaN</code>, que o código trocava por 0, a melhor nota possível, e ainda entrava no cálculo dos quartis. Afetava 22 varas. Na v2 o indicador fica indefinido: sai do boxplot e o peso do mesoindicador é redistribuído entre os indicadores disponíveis.</p></div></div>
+      <div class="fix"><div class="n">3</div><div><b>Vara removida por busca de texto</b><span class="tag">cálculo</span>
+        <p>Para não contar a vara duas vezes, o app a removia com <code>grepl(nome)</code>. Existem duas “Palmas – 01ª Vara” (TO e PR): no comparativo nacional, simular a de Palmas-TO apagava também a do Paraná. A v2 identifica cada vara pela posição na base.</p></div></div>
+      <div class="fix"><div class="n">4</div><div><b>Sinais (+/−) errados nas variáveis</b><span class="tag">interface</span>
+        <p>A tela indicava “(+)” em V10 (Recebidos) e V16 (Execuções iniciadas), mas aumentar essas variáveis piora o IGEST: elas são denominadores das taxas de solução e de execução. V09 (Solucionados) e V15 (Servidores) têm efeito misto. A v2 calcula o efeito na hora, para a vara e o cenário escolhidos.</p></div></div>
+      <div class="fix"><div class="n">5</div><div><b>Só varas do TRT-10 e sem faixa de movimentação</b><span class="tag">interface</span>
+        <p>O manual agrupa as varas pela faixa de casos novos (Res. CSJT nº 296/2021). A v2 simula qualquer vara do país e compara com o país, com o próprio TRT ou com a mesma faixa de processos recebidos.</p></div></div>
+      <div class="fix"><div class="n">i</div><div><b>Sobre os dados: a base é mascarada</b><span class="tag">dados</span>
+        <p>A base publicada no repositório tem os valores mascarados. Por isso só 980 dos 26.673 valores são inteiros, embora a maioria das variáveis seja contagem de processos, e nem sempre os valores são coerentes entre si: 323 varas têm mais conciliações do que soluções, 65 têm mais conclusos vencidos do que conclusos e 54 têm menos de um servidor. O método vale para dados reais, mas os resultados desta página não descrevem o desempenho real das varas. O simulador avisa quando um cenário cria essas inconsistências.</p></div></div>
+    </div>
+    <div class="grid" style="align-content:start">
+      <div class="card">
+        <h3>Posição nacional na v1 × v2</h3>
+        <p class="note">Cada ponto é uma vara. Fora da diagonal, a correção do limite inferior mudou a posição.</p>
+        <div class="legend" style="margin:10px 0 6px"><span><i style="background:var(--real)"></i>Demais varas</span><span><i style="background:var(--sim)"></i>TRT-10 (DF/TO)</span></div>
+        <div id="chartShift"></div>
+      </div>
+      <div class="card">
+        <h3>Efeito de aumentar 10% cada variável</h3>
+        <p class="note">Em quantas das 1.569 varas o IGEST piora ou melhora, comparado ao sinal que a v1 mostrava.</p>
+        <div class="tscroll" style="margin-top:10px"><table>
+          <thead><tr><th>Variável</th><th>Sinal na v1</th><th class="r">Piora</th><th class="r">Melhora</th><th>Leitura</th></tr></thead>
+          <tbody>
+            <tr><td class="name">V10 · Recebidos</td><td>(+)</td><td class="r">1.408</td><td class="r">0</td><td style="color:var(--bad)">sinal invertido</td></tr>
+            <tr><td class="name">V16 · Execuções iniciadas</td><td>(+)</td><td class="r">1.392</td><td class="r">0</td><td style="color:var(--bad)">sinal invertido</td></tr>
+            <tr><td class="name">V15 · Servidores</td><td>(+)</td><td class="r">842</td><td class="r">636</td><td>misto</td></tr>
+            <tr><td class="name">V09 · Solucionados</td><td>(+)</td><td class="r">630</td><td class="r">936</td><td>misto</td></tr>
+          </tbody>
+        </table></div>
+        <p class="note" style="margin-top:10px">Mais servidores sem mais processos baixados reduz a produtividade por servidor (I11), o que pode anular o ganho em pendentes por servidor (I12). O exemplo “contratar 2 servidores” do README da v1 nem sempre melhora o índice.</p>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ============ MÉTODO ============ -->
+<section id="metodo"><div class="wrap">
+  <h2>Método</h2>
+  <p class="sub">Primeiro reproduzi a v1 exatamente, depois apliquei uma correção por vez para medir o efeito de cada uma.</p>
+  <div class="steps">
+    <div class="step"><b>Dados</b>17 variáveis de 1.569 varas (arquivo.xlsx do repositório original), com o TRT de cada linha.</div>
+    <div class="step"><b>Indicadores</b>As 13 fórmulas do glossário do manual, conferidas uma a uma.</div>
+    <div class="step"><b>Limites</b>Quartis tipo 7 (padrão do R), LI e LS do boxplot dentro do grupo de comparação.</div>
+    <div class="step"><b>Notas</b>Padronização de 0 a 1 com a polaridade do manual; indefinidos fora do boxplot.</div>
+    <div class="step"><b>Índice</b>Mesoindicadores ponderados e IGEST = média dos cinco; ranking crescente.</div>
+    <div class="step"><b>Validação</b>Com a chave “Regras da v1”, o simulador reproduz os números do app em Shiny.</div>
+  </div>
+</div></section>
+
+<!-- ============ SIMULADOR ============ -->
+<section id="simulador"><div class="wrap">
+  <h2>Simulador</h2>
+  <p class="sub">Escolha uma vara, altere as variáveis e veja o IGEST, a posição e os mesoindicadores recalculados. A vara simulada entra no grupo de comparação no lugar da original, e os limites do boxplot são recalculados a cada mudança, como no índice oficial.</p>
+
+  <div class="sim">
+    <aside class="card panel" aria-label="Controles do simulador">
+      <div class="panel-hd">
+        <div class="grid" style="grid-template-columns:110px 1fr;gap:8px">
+          <label class="field"><span>Tribunal</span><select id="selTrt"></select></label>
+          <label class="field"><span>Vara do trabalho</span><select id="selVara"></select></label>
+        </div>
+        <div class="field"><span>Comparar com</span>
+          <div class="seg" id="segGrupo" role="group" aria-label="Grupo de comparação">
+            <button type="button" data-g="n" aria-pressed="true">País</button>
+            <button type="button" data-g="t" aria-pressed="false">Mesmo TRT</button>
+            <button type="button" data-g="f" aria-pressed="false">Mesma faixa</button>
+          </div>
+        </div>
+        <label class="chk"><input type="checkbox" id="chkV1"><span>Regras da versão 1 <span style="color:var(--muted)">(LI truncado em 0; indicador indefinido vira 0)</span></span></label>
+        <div class="field"><span>Cenários rápidos</span>
+          <div class="presets">
+            <button class="chip" type="button" data-p="acervo">Acervo −15%</button>
+            <button class="chip" type="button" data-p="serv">+2 servidores</button>
+            <button class="chip" type="button" data-p="exec">Execução −30 dias</button>
+            <button class="chip" type="button" data-p="baixa">Baixas +10%</button>
+            <button class="chip reset" type="button" data-p="reset">Restaurar</button>
+          </div>
+        </div>
+      </div>
+      <div class="panel-bd" id="vars"></div>
+    </aside>
+
+    <div class="results">
+      <div class="grid g4 kpis" id="kpis"></div>
+      <div class="alerts" id="alerts"></div>
+
+      <div class="card">
+        <h3>Mesoindicadores</h3>
+        <p class="note">Nota de 0 (melhor) a 1 (pior). A marca vertical é a mediana do grupo de comparação.</p>
+        <div class="legend" style="margin:10px 0 4px"><span><i style="background:var(--real)"></i>Valor real</span><span><i style="background:var(--sim)"></i>Cenário simulado</span></div>
+        <div id="chartMeso"></div>
+      </div>
+
+      <div class="grid g2">
+        <div class="card">
+          <h3>Onde agir</h3>
+          <p class="note">Quanto o IGEST cai com uma mudança de 10% em cada variável, a partir do cenário atual. Mudanças que só melhoram a conta ficam separadas no fim.</p>
+          <div id="levers" style="margin-top:10px"></div>
+        </div>
+        <div class="card">
+          <h3>IGEST no grupo de comparação</h3>
+          <p class="note" id="distNote"></p>
+          <div class="legend" style="margin:10px 0 4px"><span><i style="background:var(--q1)"></i>25% melhores</span><span><i style="background:var(--q2)"></i>50% intermediárias</span><span><i style="background:var(--q3)"></i>25% piores</span></div>
+          <div id="chartDist"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Vizinhança no ranking</h3>
+        <p class="note">As varas imediatamente acima e abaixo da posição simulada.</p>
+        <div class="tscroll" style="margin-top:8px"><table id="tblRank"></table></div>
+      </div>
+
+      <div class="card">
+        <h3>Indicadores</h3>
+        <p class="note">Valor bruto, limites do boxplot no grupo e nota padronizada. Seta para cima: quanto maior, melhor.</p>
+        <div class="tscroll" style="margin-top:8px"><table id="tblInd"></table></div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ============ CONCLUSÕES ============ -->
+<section id="conclusoes"><div class="wrap">
+  <h2>Conclusões</h2>
+  <div class="grid g2">
+    <div class="card"><ul class="concl" style="padding-left:18px;margin:0">
+      <li><b>Um detalhe de implementação pesa mais que qualquer cenário.</b> Truncar o limite inferior em zero mudou a nota média em 0,063 ponto, mais do que a maioria dos cenários de gestão que o app foi feito para testar.</li>
+      <li><b>O índice premia proporção, não volume.</b> Receber mais processos ou iniciar mais execuções piora o IGEST se as soluções não acompanharem. Mostrar o sinal fixo de cada variável induzia a leitura errada.</li>
+      <li><b>Mais servidores não é garantia de índice melhor.</b> Sem aumento nas baixas, a produtividade por servidor cai. O painel “Onde agir” mostra, para cada vara, quais alavancas de fato movem o índice.</li>
+      <li><b>O grupo de comparação muda a história.</b> A mesma vara pode estar entre as 25% piores do país e na faixa intermediária do próprio TRT ou da sua faixa de movimentação.</li>
+    </ul></div>
+    <div class="card">
+      <h3>Limitações</h3>
+      <ul class="concl" style="padding-left:18px;margin:8px 0 0">
+        <li>A base é mascarada (ver “Sobre os dados”). Os resultados ilustram o método e não descrevem o desempenho real das varas.</li>
+        <li>A faixa usa V10 (Recebidos) como aproximação dos casos novos da Res. CSJT nº 296/2021, e é definida pelo valor real da vara, para o grupo não mudar enquanto se simula.</li>
+        <li>O manual não define o tratamento de indicadores indefinidos nem o tipo de quantil; as escolhas da v2 estão documentadas acima e no código.</li>
+        <li>O e-Gestão pode aplicar regras não descritas no manual. Sem acesso ao relatório oficial do mesmo período, a v2 foi validada contra a v1, não contra o índice publicado.</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  Francisco Iago dos Reis Ferreira · Estatístico (UnB).
+  Versão 1 em R/Shiny: <a href="https://github.com/FerreiraFrancisco/Simulador-IGEST--" target="_blank" rel="noopener">código no GitHub</a>.
+  Revisão em Python: <a href="igest_v2.py">igest_v2.py</a>.
+  Metodologia: Manual de Uso do IGEST, Corregedoria-Geral da Justiça do Trabalho. Projeto sem vínculo oficial com o TST ou a CGJT.
+  <div style="margin-top:8px"><a href="../index.html#trajetoria">← Voltar ao portfólio</a></div>
+</div></footer>
+
+<div class="tt" id="tt" role="tooltip"></div>
+
+<script src="dados.js"></script>
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+const D=window.IGEST_DATA;
+const VARAS=D.varas.map((r,i)=>({id:i,nome:r[0].replace(/(\d+)a Vara$/,"$1ª Vara"),trt:r[1],v:r[2]}));
+const N=VARAS.length;
+
+/* ---------- metodologia (manual CGJT) ---------- */
+const VARS=[
+  ["V01","Idade média do pendente de julgamento","anos"],
+  ["V02","Pendentes de baixa – conhecimento",""],
+  ["V03","Liquidações pendentes",""],
+  ["V04","Pendentes de baixa – execução",""],
+  ["V05","Prazo médio – conhecimento","dias"],
+  ["V06","Prazo médio – liquidação","dias"],
+  ["V07","Prazo médio – execução","dias"],
+  ["V08","Conciliações",""],
+  ["V09","Solucionados",""],
+  ["V10","Recebidos",""],
+  ["V11","Conclusos com prazo vencido",""],
+  ["V12","Conclusos aguardando sentença",""],
+  ["V13","Baixados – conhecimento",""],
+  ["V14","Baixados – execução",""],
+  ["V15","Servidores em atividade",""],
+  ["V16","Execuções iniciadas",""],
+  ["V17","Execuções encerradas",""]
+];
+const GRUPOS=[["Acervo",[0,1,2,3,10,11]],["Prazos",[4,5,6]],["Fluxo de processos",[7,8,9,12,13]],["Execução",[15,16]],["Pessoal",[14]]];
+const IND=[
+  ["I01","Idade média do pendente de julgamento","V01"],
+  ["I02","Pendentes","V02 + V03 + V04"],
+  ["I03","Taxa de conclusos com prazo vencido","100·V11/V12"],
+  ["I04","Prazo médio – conhecimento","V05"],
+  ["I05","Prazo médio – liquidação","V06"],
+  ["I06","Prazo médio – execução","V07"],
+  ["I07","Taxa de conciliação","100·V08/V09"],
+  ["I08","Taxa de solução","100·V09/V10"],
+  ["I09","Congestionamento – conhecimento","100·V02/(V13+V02)"],
+  ["I10","Congestionamento – execução","100·V04/(V14+V04)"],
+  ["I11","Produtividade por servidor","(V13+V14)/V15"],
+  ["I12","Pendentes por servidor","(V02+V04)/V15"],
+  ["I13","Taxa de execução","100·V17/V16"]
+];
+const POS=new Set([6,7,10,12]);
+const MESOS=[["Acervo",[[0,.3],[1,.4],[2,.3]]],["Celeridade",[[3,.6],[4,.1],[5,.3]]],["Produtividade",[[6,.3],[7,.4],[12,.3]]],["Congestionamento",[[8,.5],[9,.5]]],["Força de trabalho",[[10,.5],[11,.5]]]];
+
+function indic(v){
+  const pct=(a,b)=>b!==0?100*a/b:null, div=(a,b)=>b!==0?a/b:null;
+  return [v[0],v[1]+v[2]+v[3],pct(v[10],v[11]),v[4],v[5],v[6],pct(v[7],v[8]),pct(v[8],v[9]),
+          pct(v[1],v[12]+v[1]),pct(v[3],v[13]+v[3]),div(v[12]+v[13],v[14]),div(v[1]+v[3],v[14]),pct(v[16],v[15])];
+}
+// numeradores, para reproduzir o R: 0/0 = NaN -> 0 ; x/0 = Inf
+const NUM=[null,null,v=>v[10],null,null,null,v=>v[7],v=>v[8],v=>v[1],v=>v[3],v=>v[12]+v[13],v=>v[1]+v[3],v=>v[16]];
+function brutos(v,v1){
+  const b=indic(v);
+  if(v1) for(let k=0;k<13;k++) if(b[k]===null) b[k]=NUM[k](v)===0?0:Infinity;
+  return b;
+}
+function quantil(s,p){const h=(s.length-1)*p,lo=Math.floor(h),hi=Math.min(lo+1,s.length-1);return s[lo]+(h-lo)*(s[hi]-s[lo]);}
+/* grupo de comparação em cache: brutos e valores ordenados de cada indicador */
+function grupo(mem,v1){
+  const B=mem.map(i=>brutos(VARAS[i].v,v1)), S=[];
+  for(let k=0;k<13;k++){const xs=[];for(const b of B){const x=b[k];if(x!==null&&(v1||Number.isFinite(x)))xs.push(x);}S.push(xs.sort((a,b)=>a-b));}
+  return {mem,B,S};
+}
+function lowerBound(s,x){let lo=0,hi=s.length;while(lo<hi){const m=(lo+hi)>>1;if(s[m]<x)lo=m+1;else hi=m;}return lo;}
+/* limites do boxplot do grupo + a vara simulada, sem reordenar o grupo */
+function limites(gc,b0,v1){
+  const L=[];
+  for(let k=0;k<13;k++){
+    const s=gc.S[k],x=b0[k],inc=x!==null&&(v1||Number.isFinite(x));
+    const pos=inc?lowerBound(s,x):-1,len=s.length+(inc?1:0);
+    const get=i=>!inc?s[i]:i<pos?s[i]:i===pos?x:s[i-1];
+    const q=p=>{const h=(len-1)*p,lo=Math.floor(h),hi=Math.min(lo+1,len-1);return get(lo)+(h-lo)*(get(hi)-get(lo));};
+    const q1=q(.25),q3=q(.75);let li=q1-1.5*(q3-q1);const ls=q3+1.5*(q3-q1);
+    if(v1&&li<0)li=0;
+    L.push([li,ls]);
+  }
+  return L;
+}
+function nota(x,k,L){
+  if(x===null) return null;
+  const [li,ls]=L[k]; let z;
+  if(ls===li) z=0; else if(x<li) z=0; else if(x>ls) z=1; else z=(x-li)/(ls-li);
+  return POS.has(k)?1-z:z;
+}
+function avalia(b,L){
+  const S=b.map((x,k)=>nota(x,k,L));
+  const M=MESOS.map(([,ps])=>{let t=0,s=0;for(const[k,w] of ps) if(S[k]!==null){t+=w;s+=w*S[k];}return t?s/t:null;});
+  const G=M.reduce((a,m)=>a+(m===null?0:.2*m),0);
+  return {S,M,G};
+}
+/* calcula o grupo inteiro com o vetor da vara simulada no índice 0 */
+function calcula(vec,gc,v1){
+  const b0=brutos(vec,v1),L=limites(gc,b0,v1);
+  return {B:[b0,...gc.B],L,R:[avalia(b0,L),...gc.B.map(b=>avalia(b,L))]};
+}
+function igestDe(vec,gc,v1){const b0=brutos(vec,v1);return avalia(b0,limites(gc,b0,v1)).G;}
+function posicao(R){const g=R[0].G;let p=1;for(let i=1;i<R.length;i++) if(R[i].G<g) p++;return p;}
+
+/* ---------- formatação ---------- */
+const nf=(d)=>new Intl.NumberFormat("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d});
+const F={0:nf(0),1:nf(1),2:nf(2),3:nf(3),4:nf(4)};
+const fmt=(x,d=2)=>x===null||x===undefined?"—":(Number.isFinite(x)?F[d].format(x):"∞");
+const fmtAuto=x=>Math.abs(x)>=100?F[0].format(x):Math.abs(x)>=10?F[1].format(x):F[2].format(x);
+const sgn=(x,d)=>(x>0?"+":x<0?"−":"±")+F[d].format(Math.abs(x));
+const faixaDe=r=>{const t=[500,750,1000,1500,2000,2500];for(let i=0;i<t.length;i++) if(r<=t[i]) return i;return 6;};
+const FAIXAS=["até 500","501 a 750","751 a 1.000","1.001 a 1.500","1.501 a 2.000","2.001 a 2.500","2.501 ou mais"];
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+/* ---------- cartões dos mesoindicadores ---------- */
+$("#mesoCards").innerHTML=MESOS.map(([m,ps])=>`<div class="card meso-card"><span class="w">peso 0,2</span><h3>${m}</h3><ul>${ps.map(([k,w])=>`<li><span>${IND[k][0]} · ${IND[k][1]}</span><span class="pol ${POS.has(k)?"p":"n"}">${F[1].format(w)} ${POS.has(k)?"↑":"↓"}</span></li>`).join("")}</ul></div>`).join("");
+
+/* ---------- gráfico v1 × v2 (nacional) ---------- */
+const TODOS=[...Array(N).keys()];
+function rankNacional(v1){
+  const r=calcula(VARAS[0].v,grupo(TODOS.slice(1),v1),v1).R;
+  const ord=TODOS.slice().sort((a,b)=>r[a].G-r[b].G||a-b);const p=new Array(N);ord.forEach((i,j)=>p[i]=j+1);return p;
+}
+const P1=rankNacional(true),P2=rankNacional(false);
+function drawShift(){
+  const el=$("#chartShift"),W=el.clientWidth||480,H=Math.min(360,W*.8),m={l:44,r:10,t:8,b:34};
+  const x=p=>m.l+(p-1)/(N-1)*(W-m.l-m.r), y=p=>m.t+(p-1)/(N-1)*(H-m.t-m.b);
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Dispersão da posição no ranking nacional na versão 1 contra a versão 2">`;
+  for(const t of [1,400,800,1200,1569]){s+=`<line x1="${x(t)}" x2="${x(t)}" y1="${m.t}" y2="${H-m.b}" stroke="var(--grid)"/><line x1="${m.l}" x2="${W-m.r}" y1="${y(t)}" y2="${y(t)}" stroke="var(--grid)"/><text x="${x(t)}" y="${H-m.b+16}" text-anchor="middle">${F[0].format(t)}</text><text x="${m.l-6}" y="${y(t)+4}" text-anchor="end">${F[0].format(t)}</text>`;}
+  s+=`<line x1="${x(1)}" y1="${y(1)}" x2="${x(N)}" y2="${y(N)}" stroke="var(--axis)" stroke-dasharray="3 3"/>`;
+  let o="",h="";
+  for(let i=0;i<N;i++){const c=`<circle cx="${x(P1[i]).toFixed(1)}" cy="${y(P2[i]).toFixed(1)}" r="${VARAS[i].trt===10?3.2:1.8}" data-i="${i}"`;
+    if(VARAS[i].trt===10) h+=c+` fill="var(--sim)"/>`; else o+=c+` fill="var(--real)" fill-opacity=".55"/>`;}
+  s+=o+h+`<text x="${(W+m.l)/2}" y="${H-2}" text-anchor="middle">posição na v1</text><text transform="translate(11 ${(H-m.b)/2}) rotate(-90)" text-anchor="middle">posição na v2</text></svg>`;
+  el.innerHTML=s;
+  tipOn(el,"circle",c=>{const i=+c.dataset.i,v=VARAS[i];return `<b>${v.nome}</b><br>TRT-${v.trt} (${D.trt[v.trt-1]})<br>v1: ${F[0].format(P1[i])}º · v2: ${F[0].format(P2[i])}º`;});
+}
+
+/* ---------- tooltip ---------- */
+const tt=$("#tt");
+function tipOn(el,sel,html){
+  el.onpointermove=e=>{const t=e.target.closest(sel);if(!t||!el.contains(t)){tt.style.opacity=0;return;}
+    tt.innerHTML=html(t);tt.style.opacity=1;const r=tt.getBoundingClientRect();
+    let X=e.clientX+14,Y=e.clientY+14;if(X+r.width>innerWidth-8)X=e.clientX-r.width-14;if(Y+r.height>innerHeight-8)Y=e.clientY-r.height-14;
+    tt.style.left=X+"px";tt.style.top=Y+"px";};
+  el.onpointerleave=()=>tt.style.opacity=0;
+}
+
+/* ---------- estado do simulador ---------- */
+const st={vara:VARAS.findIndex(v=>v.trt===10&&/^Bras[ií]lia - 01/.test(v.nome)),grupo:"n",v1:false,vals:null};
+if(st.vara<0) st.vara=VARAS.findIndex(v=>v.trt===10);
+
+const selTrt=$("#selTrt"),selVara=$("#selVara");
+selTrt.innerHTML=D.trt.map((s,i)=>`<option value="${i+1}">${i+1}ª · ${s}</option>`).join("");
+function fillVaras(trt,keep){
+  const vs=VARAS.filter(v=>v.trt===trt).sort((a,b)=>a.nome.localeCompare(b.nome,"pt-BR",{numeric:true}));
+  selVara.innerHTML=vs.map(v=>`<option value="${v.id}">${v.nome}</option>`).join("");
+  selVara.value=String(keep!=null?keep:vs[0].id);
+}
+
+function membros(){
+  const me=VARAS[st.vara];
+  if(st.grupo==="t") return VARAS.filter(v=>v.trt===me.trt&&v.id!==me.id).map(v=>v.id);
+  if(st.grupo==="f"){const f=faixaDe(me.v[9]);return VARAS.filter(v=>v.id!==me.id&&faixaDe(v.v[9])===f).map(v=>v.id);}
+  return VARAS.filter(v=>v.id!==me.id).map(v=>v.id);
+}
+
+/* ---------- painel de variáveis ---------- */
+const P95=VARS.map((_,j)=>{const s=VARAS.map(v=>v.v[j]).sort((a,b)=>a-b);return quantil(s,.95);});
+function buildVars(){
+  const real=VARAS[st.vara].v;
+  $("#vars").innerHTML=GRUPOS.map(([g,js])=>`<div class="vgroup"><h4>${g}</h4>${js.map(j=>{
+    const mx=Math.max(real[j]*2,P95[j],1);const step=mx/400;
+    return `<div class="var" data-j="${j}">
+      <div class="vh"><span class="code">${VARS[j][0]}</span><label for="n${j}">${VARS[j][1]}${VARS[j][2]?` <span style="color:var(--muted)">(${VARS[j][2]})</span>`:""}</label><span class="eff" id="e${j}"></span></div>
+      <div class="vc"><input type="range" id="r${j}" min="0" max="${mx}" step="${step}" aria-label="${VARS[j][1]}"><input type="number" id="n${j}" min="0" step="any" inputmode="decimal"></div>
+      <div class="vf"><span>real: ${fmtAuto(real[j])}</span><span><span class="delta" id="d${j}"></span> <button class="rst" type="button" data-j="${j}">restaurar</button></span></div>
+    </div>`;}).join("")}</div>`).join("");
+  syncInputs();
+}
+function syncInputs(){
+  const real=VARAS[st.vara].v;
+  for(let j=0;j<17;j++){
+    const v=st.vals[j];$("#r"+j).value=v;
+    const n=$("#n"+j); if(document.activeElement!==n) n.value=+v.toFixed(v>=100?0:2);
+    const d=$("#d"+j), ch=Math.abs(v-real[j])>1e-9;
+    d.className="delta "+(ch?"up":"zero");
+    d.textContent=ch?(real[j]>0?sgn((v/real[j]-1)*100,0)+"%":sgn(v-real[j],1)):"sem alteração";
+    d.closest(".var").classList.toggle("changed",ch);
+  }
+}
+$("#vars").addEventListener("input",e=>{
+  const t=e.target; if(!t.id) return; const j=+t.id.slice(1);
+  let v=parseFloat(t.value); if(!Number.isFinite(v)||v<0) return;
+  st.vals[j]=v; syncInputs(); schedule();
+});
+$("#vars").addEventListener("click",e=>{
+  const b=e.target.closest(".rst"); if(!b) return; const j=+b.dataset.j;
+  st.vals[j]=VARAS[st.vara].v[j]; syncInputs(); schedule();
+});
+
+/* ---------- cenários ---------- */
+document.querySelector(".presets").addEventListener("click",e=>{
+  const b=e.target.closest("[data-p]"); if(!b) return; const r=VARAS[st.vara].v;
+  switch(b.dataset.p){
+    case "acervo": [1,2,3].forEach(j=>st.vals[j]=r[j]*.85); break;
+    case "serv": st.vals[14]=r[14]+2; break;
+    case "exec": st.vals[6]=Math.max(0,r[6]-30); break;
+    case "baixa": [12,13].forEach(j=>st.vals[j]=r[j]*1.1); break;
+    case "reset": st.vals=r.slice(); break;
+  }
+  syncInputs(); schedule();
+});
+
+/* ---------- recálculo ---------- */
+let raf=0, cacheReal=null, cacheG=null;
+/* um recálculo por quadro; o setTimeout cobre abas em segundo plano, onde o rAF não dispara */
+function schedule(){
+  if(raf) return;
+  const run=()=>{ if(!raf) return; cancelAnimationFrame(raf.a); clearTimeout(raf.t); raf=0; render(); };
+  raf={a:requestAnimationFrame(run),t:setTimeout(run,60)};
+}
+function keyReal(){return st.vara+"|"+st.grupo+"|"+st.v1;}
+
+function render(){
+  const me=VARAS[st.vara];
+  if(!cacheG||cacheG.k!==keyReal()){cacheG={k:keyReal(),gc:grupo(membros(),st.v1)};}
+  const gc=cacheG.gc, mem=gc.mem;
+  if(!cacheReal||cacheReal.k!==keyReal()){const c=calcula(me.v,gc,st.v1);cacheReal={k:keyReal(),c,pos:posicao(c.R)};}
+  const real=cacheReal.c, simc=calcula(st.vals,gc,st.v1);
+  const rR=real.R[0], rS=simc.R[0], n=mem.length+1;
+  const pR=cacheReal.pos, pS=posicao(simc.R);
+  const band=p=>p<=n*.25?0:(p>n*.75?2:1);
+  const BANDS=["25% melhores","50% intermediárias","25% piores"];
+  const dG=rS.G-rR.G, dP=pR-pS;
+  const grupoTxt=st.grupo==="n"?"país":st.grupo==="t"?`TRT-${me.trt}`:`faixa de ${FAIXAS[faixaDe(me.v[9])]} recebidos`;
+  const cls=x=>x<-1e-9?"good":x>1e-9?"bad":"";
+  $("#kpis").innerHTML=`
+    <div class="card tile kpi"><div class="v">${fmt(rS.G,4)}</div><div class="l">IGEST simulado</div><div class="cmp">real ${fmt(rR.G,4)} · <b class="${cls(dG)}">${sgn(dG,4)}</b></div></div>
+    <div class="card tile kpi"><div class="v">${F[0].format(pS)}º</div><div class="l">de ${F[0].format(n)} varas (${grupoTxt})</div><div class="cmp">real ${F[0].format(pR)}º · <b class="${cls(-dP)}">${dP===0?"mesma posição":(dP>0?"sobe ":"cai ")+F[0].format(Math.abs(dP))}</b></div></div>
+    <div class="card tile kpi"><div class="v" style="font-size:22px;padding:6px 0 4px"><span class="band b${band(pS)}">${BANDS[band(pS)]}</span></div><div class="l">faixa do cenário</div><div class="cmp">real: ${BANDS[band(pR)]}</div></div>
+    <div class="card tile kpi"><div class="v">${F[0].format(Math.round(100*(n-pS)/(n-1||1)))}%</div><div class="l">das varas do grupo ficam atrás</div><div class="cmp">real ${F[0].format(Math.round(100*(n-pR)/(n-1||1)))}%</div></div>`;
+
+  // alertas de consistência
+  const al=[], v=st.vals, rv=me.v;
+  const chk=(cond,condR,txt)=>{ if(cond) al.push(`<div class="alert"><b>Cenário inconsistente:</b> ${txt}${condR?" A base mascarada já traz essa inconsistência para esta vara.":""}</div>`); };
+  chk(v[7]>v[8],rv[7]>rv[8],"conciliações (V08) maiores que solucionados (V09). Toda conciliação é uma solução, então a taxa de conciliação passa de 100%.");
+  chk(v[10]>v[11],rv[10]>rv[11],"conclusos com prazo vencido (V11) maiores que o total de conclusos (V12).");
+  chk(v[14]<1,rv[14]<1,"menos de um servidor em atividade (V15).");
+  if(st.v1) al.push(`<div class="alert"><b>Regras da versão 1 ativas.</b> Os números reproduzem o app em Shiny, que diverge do manual (ver Revisão).</div>`);
+  $("#alerts").innerHTML=al.join("");
+
+  drawMeso(real,simc); drawDist(simc,rR.G,rS.G,n); drawLevers(gc,rS.G); drawRank(simc,mem,pS); drawInd(real,simc); effects(simc);
+  writeHash();
+}
+
+/* efeito de +10% em cada variável, com o cenário atual (para o rótulo ao lado de cada variável e para "Onde agir") */
+let LEV=[];
+function effects(simc){
+  for(let j=0;j<17;j++){
+    const e=$("#e"+j), d=LEV[j];
+    if(!d||Math.abs(d.up)<1e-7){e.className="eff none";e.textContent="sem efeito";continue;}
+    e.className="eff "+(d.up>0?"up-bad":"up-good"); e.textContent=d.up>0?"↑ piora":"↑ melhora";
+  }
+}
+/* mudanças que melhoram a conta sem melhorar a prestação jurisdicional */
+function contabil(j,dir){
+  if(j===9) return true;                 // V10 recebidos: não depende da vara
+  if(j===11&&dir>0) return true;         // mais conclusos aguardando sentença
+  if(j===15&&dir<0) return true;         // iniciar menos execuções
+  if(j===14&&dir<0) return true;         // menos servidores
+  if(j===8&&dir<0) return true;          // solucionar menos
+  return false;
+}
+function drawLevers(gc,g0){
+  LEV=[];
+  for(let j=0;j<17;j++){
+    const up=st.vals.slice(), dn=st.vals.slice(); up[j]*=1.1; dn[j]*=.9;
+    const gu=igestDe(up,gc,st.v1), gd=igestDe(dn,gc,st.v1);
+    LEV[j]={up:gu-g0,dn:gd-g0};
+  }
+  const all=LEV.map((d,j)=>{const best=d.up<d.dn?{dir:1,dg:d.up}:{dir:-1,dg:d.dn};return {j,...best};})
+    .filter(r=>r.dg<-1e-6).sort((a,b)=>a.dg-b.dg);
+  const rows=all.filter(r=>!contabil(r.j,r.dir)).slice(0,7), cont=all.filter(r=>contabil(r.j,r.dir));
+  const foot=cont.length?`<p class="note" style="margin-top:10px"><b style="color:var(--ink-2)">Efeito só contábil:</b> ${cont.map(r=>`${r.dir>0?"aumentar":"reduzir"} ${VARS[r.j][0]} (${VARS[r.j][1].toLowerCase()})`).join("; ")} também reduziria o IGEST, sem refletir melhor gestão.</p>`:"";
+  if(!rows.length){$("#levers").innerHTML=`<p class="empty">Nenhuma variável de gestão melhora o IGEST com uma mudança de 10% neste cenário.</p>`+foot;return;}
+  const mx=-rows[0].dg;
+  $("#levers").innerHTML=rows.map(r=>`<div class="lever"><div class="nm">${VARS[r.j][0]} · ${VARS[r.j][1]}<small>${r.dir>0?"aumentar":"reduzir"} 10%</small></div>
+    <div class="barw"><div class="bar" style="width:${Math.max(4,100*(-r.dg)/mx)}%"></div></div>
+    <div style="display:flex;gap:8px;align-items:center"><span class="val">${sgn(r.dg,4)}</span><button class="chip" type="button" data-j="${r.j}" data-dir="${r.dir}">aplicar</button></div></div>`).join("")+foot;
+}
+$("#levers").addEventListener("click",e=>{const b=e.target.closest("button[data-j]");if(!b)return;const j=+b.dataset.j;st.vals[j]*=(+b.dataset.dir>0?1.1:.9);syncInputs();schedule();});
+
+function drawMeso(real,simc){
+  const el=$("#chartMeso"),W=el.clientWidth||600,rowH=40,m={l:150,r:56,t:6,b:24},H=m.t+m.b+rowH*5;
+  const x=v=>m.l+v*(W-m.l-m.r);
+  const med=MESOS.map((_,k)=>{const s=simc.R.map(r=>r.M[k]).filter(v=>v!==null).sort((a,b)=>a-b);return quantil(s,.5);});
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Mesoindicadores, real e simulado">`;
+  for(const t of [0,.25,.5,.75,1]) s+=`<line x1="${x(t)}" x2="${x(t)}" y1="${m.t}" y2="${H-m.b}" stroke="var(--grid)"/><text x="${x(t)}" y="${H-6}" text-anchor="middle">${F[2].format(t)}</text>`;
+  MESOS.forEach(([nm],k)=>{
+    const y=m.t+rowH*k+rowH/2, a=real.R[0].M[k], b=simc.R[0].M[k];
+    s+=`<text x="0" y="${y+4}" class="ink2">${nm}</text>`;
+    s+=`<line x1="${x(med[k])}" x2="${x(med[k])}" y1="${y-11}" y2="${y+11}" stroke="var(--axis)" stroke-width="2"/>`;
+    if(a!==null&&b!==null){
+      const col=b<a-1e-9?"var(--good)":b>a+1e-9?"var(--bad)":"var(--axis)";
+      s+=`<line x1="${x(a)}" x2="${x(b)}" y1="${y}" y2="${y}" stroke="${col}" stroke-width="3" stroke-linecap="round"/>`;
+      s+=`<circle cx="${x(a)}" cy="${y}" r="6" fill="var(--real)"/><circle cx="${x(b)}" cy="${y}" r="6" fill="var(--sim)" stroke="var(--surface)" stroke-width="2"/>`;
+      s+=`<text x="${W-m.r+10}" y="${y+4}" class="ink">${fmt(b,3)}</text>`;
+    }
+  });
+  el.innerHTML=s+"</svg>";
+}
+function drawDist(simc,gR,gS,n){
+  const el=$("#chartDist"),W=el.clientWidth||400,H=190,m={l:8,r:8,t:18,b:24};
+  const gs=simc.R.map(r=>r.G).sort((a,b)=>a-b), lo=Math.min(gs[0],gR)-.01, hi=Math.max(gs[gs.length-1],gR)+.01;
+  const q1=quantil(gs,.25),q3=quantil(gs,.75);
+  const bins=Math.max(10,Math.min(40,Math.round(n/12))), bw=(hi-lo)/bins, cnt=new Array(bins).fill(0);
+  gs.forEach(g=>cnt[Math.min(bins-1,Math.floor((g-lo)/bw))]++);
+  const mx=Math.max(...cnt), x=v=>m.l+(v-lo)/(hi-lo)*(W-m.l-m.r), y=c=>H-m.b-c/mx*(H-m.t-m.b);
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Distribuição do IGEST no grupo de comparação">`;
+  cnt.forEach((c,i)=>{const a=lo+i*bw,mid=a+bw/2,col=mid<=q1?"var(--q1)":mid>q3?"var(--q3)":"var(--q2)";
+    s+=`<rect x="${x(a)+.5}" y="${y(c)}" width="${Math.max(1,x(a+bw)-x(a)-1)}" height="${H-m.b-y(c)}" fill="${col}" rx="1.5"/>`;});
+  s+=`<line x1="${m.l}" x2="${W-m.r}" y1="${H-m.b}" y2="${H-m.b}" stroke="var(--axis)"/>`;
+  const mk=(g,c,lab,dy)=>`<line x1="${x(g)}" x2="${x(g)}" y1="${m.t-4}" y2="${H-m.b}" stroke="${c}" stroke-width="2" ${c==="var(--real)"?'stroke-dasharray="3 3"':""}/><text x="${x(g)}" y="${m.t-8+dy}" text-anchor="${x(g)>W*.75?"end":"start"}" class="ink2" style="font-weight:600">${lab}</text>`;
+  s+=mk(gR,"var(--real)","real",0)+mk(gS,"var(--sim)","simulado",Math.abs(x(gS)-x(gR))<60?-12:0);
+  s+=`<text x="${m.l}" y="${H-6}">${fmt(lo,2)}</text><text x="${W-m.r}" y="${H-6}" text-anchor="end">${fmt(hi,2)}</text><text x="${W/2}" y="${H-6}" text-anchor="middle">IGEST (menor é melhor)</text></svg>`;
+  el.innerHTML=s;
+  $("#distNote").textContent=`${F[0].format(n)} varas no grupo. Mediana ${fmt(quantil(gs,.5),3)}; 25% melhores até ${fmt(q1,3)}; 25% piores acima de ${fmt(q3,3)}.`;
+}
+function drawRank(simc,mem,pS){
+  const rows=simc.R.map((r,i)=>({i,G:r.G,nome:i===0?VARAS[st.vara].nome+" (simulada)":VARAS[mem[i-1]].nome,trt:i===0?VARAS[st.vara].trt:VARAS[mem[i-1]].trt}))
+    .sort((a,b)=>a.G-b.G||(a.i===0?-1:b.i===0?1:a.i-b.i));
+  const k=rows.findIndex(r=>r.i===0), a=Math.max(0,k-4), b=Math.min(rows.length,k+5);
+  let h=`<thead><tr><th class="r">Posição</th><th>Vara</th><th>TRT</th><th class="r">IGEST</th>${MESOS.map(([m])=>`<th class="r">${m}</th>`).join("")}</tr></thead><tbody>`;
+  for(let t=a;t<b;t++){const r=rows[t],R=simc.R[r.i];
+    h+=`<tr class="${r.i===0?"hl":""}"><td class="r">${F[0].format(t+1)}º</td><td class="name">${r.nome}</td><td>${r.trt}</td><td class="r">${fmt(r.G,4)}</td>${R.M.map(m=>`<td class="r">${fmt(m,3)}</td>`).join("")}</tr>`;}
+  $("#tblRank").innerHTML=h+"</tbody>";
+}
+function drawInd(real,simc){
+  const bR=real.B[0],bS=simc.B[0],sR=real.R[0].S,sS=simc.R[0].S,L=simc.L;
+  let h=`<thead><tr><th>Indicador</th><th>Fórmula</th><th class="r">Bruto real</th><th class="r">Bruto simulado</th><th class="r">LI</th><th class="r">LS</th><th class="r">Nota real</th><th class="r">Nota simulada</th></tr></thead><tbody>`;
+  IND.forEach(([c,nm,fx],k)=>{const d=(sS[k]??0)-(sR[k]??0);
+    h+=`<tr><td class="name">${c} · ${nm} <span class="pol ${POS.has(k)?"p":"n"}">${POS.has(k)?"↑":"↓"}</span></td><td style="color:var(--muted);white-space:nowrap">${fx}</td><td class="r">${fmtNum(bR[k])}</td><td class="r">${fmtNum(bS[k])}</td><td class="r">${fmtNum(L[k][0])}</td><td class="r">${fmtNum(L[k][1])}</td><td class="r">${fmt(sR[k],3)}</td><td class="r" style="font-weight:600;color:${d<-1e-9?"var(--good)":d>1e-9?"var(--bad)":"inherit"}">${sS[k]===null?"indefinido":fmt(sS[k],3)}</td></tr>`;});
+  $("#tblInd").innerHTML=h+"</tbody>";
+}
+const fmtNum=x=>x===null?"indefinido":!Number.isFinite(x)?"∞":fmtAuto(x);
+
+/* ---------- controles ---------- */
+function setVara(id,vals){
+  st.vara=id; const me=VARAS[id];
+  selTrt.value=String(me.trt); fillVaras(me.trt,id);
+  st.vals=vals||me.v.slice(); buildVars(); schedule();
+}
+selTrt.addEventListener("change",()=>{const t=+selTrt.value;const vs=VARAS.filter(v=>v.trt===t).sort((a,b)=>a.nome.localeCompare(b.nome,"pt-BR",{numeric:true}));setVara(vs[0].id);});
+selVara.addEventListener("change",()=>setVara(+selVara.value));
+$("#segGrupo").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;st.grupo=b.dataset.g;
+  document.querySelectorAll("#segGrupo button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));schedule();});
+$("#chkV1").addEventListener("change",e=>{st.v1=e.target.checked;schedule();});
+
+/* ---------- link compartilhável (#v=id&g=n&r=0&s=j:val,...) ---------- */
+let hashT=0;
+function writeHash(){
+  clearTimeout(hashT); hashT=setTimeout(()=>{
+    const r=VARAS[st.vara].v, ch=st.vals.map((v,j)=>Math.abs(v-r[j])>1e-9?`${j}:${+v.toFixed(4)}`:null).filter(Boolean);
+    const h=`v=${st.vara}&g=${st.grupo}&r=${st.v1?1:0}`+(ch.length?`&s=${ch.join(",")}`:"");
+    history.replaceState(null,"","#"+h);
+  },250);
+}
+function readHash(){
+  const p=new URLSearchParams(location.hash.slice(1)); if(!p.has("v")) return false;
+  const id=+p.get("v"); if(!(id>=0&&id<N)) return false;
+  st.grupo=["n","t","f"].includes(p.get("g"))?p.get("g"):"n"; st.v1=p.get("r")==="1";
+  const vals=VARAS[id].v.slice();
+  (p.get("s")||"").split(",").filter(Boolean).forEach(x=>{const[j,v]=x.split(":").map(Number);if(j>=0&&j<17&&v>=0)vals[j]=v;});
+  $("#chkV1").checked=st.v1; document.querySelectorAll("#segGrupo button").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.g===st.grupo)));
+  setVara(id,vals); return true;
+}
+
+/* ---------- tema e redimensionamento ---------- */
+$("#themeBtn").addEventListener("click",()=>{const r=document.documentElement;const dark=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;r.dataset.theme=dark?"light":"dark";});
+let rz=0; addEventListener("resize",()=>{clearTimeout(rz);rz=setTimeout(()=>{drawShift();schedule();},120);});
+
+drawShift();
+if(!readHash()) setVara(st.vara);
+window.__igest={VARAS,calcula,grupo,posicao,st};
+})();
+</script>
+</body>
+</html>

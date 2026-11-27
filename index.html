@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Francisco Iago · Estatístico e Analista de Dados</title>
+<meta name="description" content="Portfólio de Francisco Iago dos R. Ferreira, estatístico (UnB) e analista de dados no setor público: engenharia de dados, modelagem estatística, machine learning e BI.">
+<meta name="theme-color" content="#0B1315">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js')</script>
+<style>
+  /* =========================================================
+     Tokens
+     ========================================================= */
+  :root{
+    --ink:#0B1315; --ink-2:#111C1F; --ink-3:#1A282C;
+    --bg:#F3EFE7; --surface:#FBF9F5; --surface-2:#EAE5DA;
+    --text:#121A1C; --text-2:#3A4447; --mut:#687174;
+    --line:rgba(18,26,28,.12); --line-2:rgba(18,26,28,.22);
+    --on-ink:#ECE8DF; --on-ink-2:#B4BCBA; --on-ink-mut:#7E8A88; --line-ink:rgba(255,255,255,.09);
+    --amber:#E8A33D; --amber-ink:#875810; --teal:#2A8A7E; --teal-ink:#1C6157; --coral:#D0603F;
+
+    --serif:"Instrument Serif","Iowan Old Style","Times New Roman",serif;
+    --sans:"Geist",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --mono:"Geist Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+
+    /* curvas fortes (emilkowalski/skills) */
+    --ease-out:cubic-bezier(0.23,1,0.32,1);
+    --ease-in-out:cubic-bezier(0.77,0,0.175,1);
+    --ease-drawer:cubic-bezier(0.32,0.72,0,1);
+
+    --max:1320px;
+    --gutter:clamp(20px,4vw,56px);
+    --gap:clamp(16px,2vw,24px);
+    --radius:14px;
+    --section:clamp(96px,13vw,168px);
+    --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* =========================================================
+     Base
+     ========================================================= */
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;scroll-padding-top:96px;-webkit-text-size-adjust:100%;interpolate-size:allow-keywords}
+  body{font-family:var(--sans);font-size:17px;line-height:1.6;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;font-feature-settings:"ss01"}
+  html.lock{overflow:hidden}
+  img,svg{display:block;max-width:100%}
+  a{color:inherit;text-decoration:none}
+  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+  ul,ol{list-style:none}
+  h1,h2,h3,h4{font-weight:400;text-wrap:balance}
+  p{text-wrap:pretty}
+  ::selection{background:var(--amber);color:var(--ink)}
+  :focus-visible{outline:2px solid var(--amber);outline-offset:3px;border-radius:4px}
+
+  .container{max-width:var(--max);margin:0 auto;padding:0 var(--gutter)}
+  .grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gap)}
+  .mono{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+  .tnum{font-variant-numeric:tabular-nums}
+  .skip{position:absolute;left:12px;top:-60px;z-index:100;background:var(--amber);color:var(--ink);padding:10px 14px;border-radius:8px;font-weight:600;transition:transform .2s var(--ease-out)}
+  .skip:focus{transform:translateY(72px)}
+
+  /* barra de leitura (scroll-driven, sem JS) */
+  .progress{display:none}
+  @supports (animation-timeline: scroll()){
+    .progress{display:block;position:fixed;inset:0 0 auto;height:2px;z-index:60;background:var(--amber);transform-origin:0 50%;animation:progress linear both;animation-timeline:scroll(root)}
+    @keyframes progress{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  }
+
+  /* =========================================================
+     Header (pílula flutuante)
+     ========================================================= */
+  .site-header{position:fixed;inset:12px 0 auto;z-index:50;pointer-events:none}
+  .bar{pointer-events:auto;display:flex;align-items:center;justify-content:space-between;gap:16px;height:56px;padding:0 8px 0 20px;border-radius:999px;background:rgba(11,19,21,.74);-webkit-backdrop-filter:saturate(140%) blur(16px);backdrop-filter:saturate(140%) blur(16px);border:1px solid rgba(255,255,255,.08);color:var(--on-ink);box-shadow:0 10px 30px -12px rgba(0,0,0,.35)}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:15px;letter-spacing:.01em;white-space:nowrap}
+  .brand b{font-weight:600}
+  .brand span{color:var(--amber)}
+  .nav{position:relative}
+  .nav-list,.nav-active{display:flex;gap:2px}
+  .nav a,.nav-active span{display:block;padding:8px 13px;font-size:13.5px;line-height:1.2;border-radius:999px;white-space:nowrap}
+  .nav a{color:var(--on-ink-2);transition:color .2s ease}
+  .nav-active{position:absolute;inset:0;pointer-events:none;background:var(--amber);color:var(--ink);font-weight:500;opacity:0;clip-path:inset(0 100% 0 0 round 999px);transition:clip-path 320ms var(--ease-out),opacity 200ms ease}
+  .nav-active.show{opacity:1}
+  .nav-active span{font-weight:500}
+  .nav a{font-weight:500}
+  .header-cta{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:999px;background:var(--on-ink);color:var(--ink);font-size:13.5px;font-weight:600;transition:transform 160ms var(--ease-out),background-color .2s ease}
+  .menu-btn{display:none;align-items:center;gap:10px;height:40px;padding:0 16px;border-radius:999px;background:rgba(255,255,255,.08);font-size:14px;font-weight:500;transition:transform 160ms var(--ease-out),background-color .2s ease}
+  .menu-btn i{position:relative;width:14px;height:8px}
+  .menu-btn i::before,.menu-btn i::after{content:"";position:absolute;left:0;right:0;height:1.5px;background:currentColor;border-radius:2px;transition:transform 240ms var(--ease-out)}
+  .menu-btn i::before{top:0}.menu-btn i::after{bottom:0}
+  .menu-btn[aria-expanded="true"] i::before{transform:translateY(3.25px) rotate(45deg)}
+  .menu-btn[aria-expanded="true"] i::after{transform:translateY(-3.25px) rotate(-45deg)}
+  @media (hover:hover) and (pointer:fine){
+    .nav a:hover{color:#fff}
+    .header-cta:hover{background:#fff}
+    .menu-btn:hover{background:rgba(255,255,255,.14)}
+  }
+  .header-cta:active,.menu-btn:active{transform:scale(.97)}
+  @media (max-width:1139px){
+    .nav,.header-cta{display:none}
+    .menu-btn{display:inline-flex}
+  }
+
+  /* menu mobile (folha) */
+  .sheet{position:fixed;inset:0;z-index:45;background:var(--ink);color:var(--on-ink);padding:104px var(--gutter) 32px;display:flex;flex-direction:column;justify-content:space-between;overflow-y:auto;opacity:0;visibility:hidden;transform:translateY(-12px);transition:opacity 200ms var(--ease-out),transform 200ms var(--ease-out),visibility 0s linear 200ms}
+  .sheet::before{content:"";position:absolute;inset:0;background:var(--grain);opacity:.05;pointer-events:none}
+  .sheet.open{opacity:1;visibility:visible;transform:none;transition:opacity 300ms var(--ease-drawer),transform 300ms var(--ease-drawer),visibility 0s}
+  .sheet ol{display:flex;flex-direction:column;counter-reset:m}
+  .sheet li{border-top:1px solid var(--line-ink)}
+  .sheet li:last-child{border-bottom:1px solid var(--line-ink)}
+  .sheet a{counter-increment:m;display:flex;align-items:baseline;gap:16px;padding:12px 0;font-family:var(--serif);font-size:clamp(32px,8vw,48px);line-height:1.1;color:var(--on-ink);transition:color .2s ease}
+  .sheet a::before{content:counter(m,decimal-leading-zero);font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--on-ink-mut);min-width:22px}
+  .sheet a[aria-current="true"]{color:var(--amber)}
+  .sheet-foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:40px;color:var(--on-ink-mut);font-size:14px}
+
+  /* =========================================================
+     Botões e links
+     ========================================================= */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:48px;padding:0 22px;white-space:nowrap;border-radius:999px;font-size:15px;font-weight:600;transition:transform 160ms var(--ease-out),background-color .2s ease,border-color .2s ease,color .2s ease}
+  .btn:active{transform:scale(.97)}
+  .btn .arr{display:inline-block;transition:transform 200ms var(--ease-out)}
+  .btn.primary{background:var(--amber);color:var(--ink)}
+  .btn.ghost{border:1px solid rgba(255,255,255,.22);color:var(--on-ink)}
+  .link-arrow{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:15px;color:var(--teal-ink);background-image:linear-gradient(currentColor,currentColor);background-size:0% 1px;background-position:0 100%;background-repeat:no-repeat;padding-bottom:2px;transition:background-size 300ms var(--ease-out)}
+  .link-arrow .arr{display:inline-block;transition:transform 200ms var(--ease-out)}
+  @media (hover:hover) and (pointer:fine){
+    .btn.primary:hover{background:#F1B455}
+    .btn.ghost:hover{border-color:rgba(255,255,255,.45);background:rgba(255,255,255,.04)}
+    .btn:hover .arr.down{transform:translateY(2px)}
+    .btn:hover .arr.right,.link-arrow:hover .arr{transform:translateX(3px)}
+    .link-arrow:hover .arr.ne{transform:translate(2px,-2px)}
+    .link-arrow:hover{background-size:100% 1px}
+  }
+
+  /* =========================================================
+     Hero
+     ========================================================= */
+  .hero{position:relative;background:var(--ink);color:var(--on-ink);overflow:hidden;isolation:isolate}
+  .hero::before{content:"";position:absolute;inset:0;background:var(--grain);opacity:.055;z-index:-1;pointer-events:none}
+  .hero::after{content:"";position:absolute;inset:-20% -10% auto auto;width:70vw;height:70vw;max-width:980px;max-height:980px;background:radial-gradient(closest-side,rgba(42,138,126,.18),transparent 70%);z-index:-2;pointer-events:none}
+  .hero-inner{min-height:100svh;display:flex;flex-direction:column;padding-top:clamp(100px,12vh,140px);padding-bottom:clamp(40px,6vh,64px)}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:8px 28px;color:var(--on-ink-mut);padding-bottom:20px;border-bottom:1px solid var(--line-ink)}
+  .hero-meta .status{color:var(--on-ink-2);display:inline-flex;align-items:center;gap:8px}
+  .hero-meta .status i{width:7px;height:7px;border-radius:50%;background:#5BC4A0;box-shadow:0 0 0 4px rgba(91,196,160,.14)}
+  .hero-meta .sp{margin-left:auto}
+  .hero-title{font-family:var(--serif);font-size:clamp(60px,min(10.4vw,16vh),164px);line-height:.9;letter-spacing:-.025em;margin:clamp(24px,4.5vh,56px) 0 clamp(28px,4.5vh,56px)}
+  .hero-title .line{display:block;overflow:hidden;padding-bottom:.08em;margin-bottom:-.08em}
+  .hero-title .line>span{display:block}
+  .hero-title em{color:var(--on-ink-2)}
+  .hero-grid{margin-top:auto;align-items:start;row-gap:40px}
+  .hero-copy{grid-column:1/7;max-width:520px}
+  .hero-role{font-size:clamp(19px,1.7vw,23px);line-height:1.45;color:var(--on-ink)}
+  .hero-role span{color:var(--on-ink-mut)}
+  .hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+  .hero-tags li{font-size:13.5px;color:var(--on-ink-2);border:1px solid var(--line-ink);border-radius:999px;padding:5px 12px;background:rgba(255,255,255,.02)}
+  .hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}
+
+  /* gráfico de regressão */
+  .chart{grid-column:8/-1;background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.01));border:1px solid var(--line-ink);border-radius:18px;padding:20px 20px 14px}
+  .chart-cap{display:flex;justify-content:space-between;gap:12px;color:var(--on-ink-mut);font-family:var(--mono);font-size:12px;margin-bottom:6px}
+  .chart-cap b{font-weight:500;color:var(--on-ink-2)}
+  .chart svg{width:100%;height:auto;overflow:visible;touch-action:pan-y}
+  .chart .axis{stroke:rgba(255,255,255,.22)}
+  .chart .gridl{stroke:rgba(255,255,255,.06)}
+  .chart text{font-family:var(--mono);font-size:10px;fill:var(--on-ink-mut)}
+  .chart-legend{display:flex;gap:18px;flex-wrap:wrap;align-items:center;font-family:var(--mono);font-size:11.5px;color:var(--on-ink-mut);margin-top:8px}
+  .chart-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:0}
+  .chart-legend .hint{margin-left:auto;opacity:.8;display:none}
+  @media (hover:hover) and (pointer:fine){.chart-legend .hint{display:inline}}
+  .pt{fill:var(--teal);transform-box:fill-box;transform-origin:center}
+  .fit{stroke:var(--amber);stroke-width:2.5;fill:none;stroke-linecap:round;stroke-dasharray:1 1}
+  .band{fill:var(--teal);fill-opacity:.2}
+  .outlier circle{fill:var(--coral);transform-box:fill-box;transform-origin:center}
+  .outlier .ring{fill:none;stroke:var(--coral);stroke-opacity:.5}
+  .outlier text{fill:#E6A28E}
+  .cross{opacity:0;transition:opacity 150ms ease;pointer-events:none}
+  .cross.on{opacity:1}
+  .cross .v{stroke:rgba(255,255,255,.35);stroke-dasharray:2 3}
+  .cross .h{stroke:rgba(232,163,61,.5);stroke-dasharray:2 3}
+  .cross .dot{fill:var(--ink);stroke:var(--amber);stroke-width:2}
+  .cross rect{fill:var(--on-ink)}
+  .cross text{fill:var(--ink);font-size:10.5px;font-weight:500}
+
+  /* coreografia de entrada do hero (uma vez por visita) */
+  @keyframes rise{from{transform:translateY(105%)}}
+  @keyframes up{from{opacity:0;transform:translateY(var(--y,12px))}}
+  @keyframes fade{from{opacity:0}}
+  @keyframes pop{from{opacity:0;transform:scale(.4)}}
+  @keyframes draw{from{stroke-dashoffset:1}}
+  .hero-meta{animation:fade 700ms ease both}
+  .hero-title .line>span{animation:rise 1050ms var(--ease-out) both;animation-delay:var(--d,0ms)}
+  .hero-copy>*{animation:up 800ms var(--ease-out) both;animation-delay:var(--d,0ms)}
+  .chart{--y:18px;animation:up 900ms var(--ease-out) both;animation-delay:280ms}
+  .pt{animation:pop 420ms var(--ease-out) both;animation-delay:var(--d,0ms)}
+  .fit{animation:draw 1100ms var(--ease-in-out) 760ms both}
+  .band{animation:fade 800ms ease 1200ms both}
+  .outlier circle{animation:pop 500ms var(--ease-out) 1650ms both}
+  .outlier .note{animation:fade 500ms ease 1800ms both}
+
+  /* =========================================================
+     Seções
+     ========================================================= */
+  .section{padding:var(--section) 0}
+  .section + .section{padding-top:0}
+  .sec-head{align-items:baseline;border-top:1px solid var(--line-2);padding-top:20px;margin-bottom:clamp(48px,7vw,96px)}
+  .sec-index{grid-column:1/4;display:flex;gap:12px;color:var(--mut)}
+  .sec-index b{font-weight:500;color:var(--text)}
+  .sec-title{grid-column:4/-1;font-family:var(--serif);font-size:clamp(48px,7.4vw,112px);line-height:.92;letter-spacing:-.025em;color:var(--text)}
+  .sec-title em{color:var(--mut)}
+  .col-main{grid-column:4/-1}
+
+  /* sobre */
+  .lead{font-family:var(--serif);font-size:clamp(30px,3.6vw,52px);line-height:1.08;letter-spacing:-.012em;color:var(--text)}
+  .lead em{color:var(--teal-ink)}
+  .about-body{grid-column:4/10;margin-top:clamp(36px,4vw,56px);color:var(--text-2);display:grid;gap:16px}
+  .about-body strong{font-weight:600;color:var(--text)}
+  .stats{grid-column:4/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--gap);margin-top:clamp(56px,7vw,96px)}
+  .stat{border-top:1px solid var(--line-2);padding-top:16px}
+  .stat dt{font-family:var(--serif);font-size:clamp(44px,4.6vw,68px);line-height:1;letter-spacing:-.02em;color:var(--text)}
+  .stat dd{margin-top:12px;font-size:14.5px;line-height:1.45;color:var(--mut);max-width:24ch}
+
+  /* trajetória */
+  .job{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gap);padding:clamp(48px,6vw,80px) 0;border-top:1px solid var(--line)}
+  .job:first-child{border-top:0;padding-top:0}
+  .job-meta{grid-column:1/4;align-self:start;position:sticky;top:104px;padding-right:12px}
+  .job-num{color:var(--amber-ink)}
+  .job-title{font-family:var(--serif);font-size:clamp(34px,3.6vw,52px);line-height:1;letter-spacing:-.015em;margin:14px 0 18px}
+  .job-pos{font-weight:500;color:var(--teal-ink);line-height:1.4}
+  .job-pos small{display:block;font-weight:400;color:var(--mut);font-size:14px;margin-top:4px}
+  .job-when{margin-top:10px;color:var(--mut);font-size:14.5px}
+  .job-body{grid-column:4/-1}
+  .job-desc{display:grid;gap:14px;color:var(--text-2);max-width:68ch}
+  .sub{display:flex;align-items:center;gap:14px;margin:clamp(40px,5vw,56px) 0 20px;color:var(--mut)}
+  .sub::after{content:"";flex:1;height:1px;background:var(--line)}
+  .prod-intro{color:var(--text-2);max-width:68ch;margin:-4px 0 24px;font-size:16px}
+
+  /* cartões de produto */
+  .prods{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--gap);align-items:start}
+  .prod{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column}
+  .prod-media{position:relative;overflow:hidden;background:#fff;border-bottom:1px solid var(--line)}
+  .prod-media img,.prod-media svg{width:100%;height:100%;transition:transform 700ms var(--ease-out)}
+  .prod-media.fig{aspect-ratio:4/3}
+  .prod-media.fig img{object-fit:contain;padding:18px}
+  .prod-media.photo{aspect-ratio:16/10}
+  .prod-media.photo img{object-fit:cover}
+  .prod-media.gestante{background:#1B0D52}
+  .prod-media.gestante img{object-fit:contain}
+  .prod-media figcaption{position:absolute;left:12px;bottom:12px;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--mut);background:rgba(251,249,245,.92);border:1px solid var(--line);border-radius:6px;padding:3px 8px}
+  .prod-body{padding:clamp(22px,2.4vw,30px);display:flex;flex-direction:column;gap:14px;flex:1}
+  .tag{font-family:var(--mono);font-size:11.5px;letter-spacing:.03em;color:var(--mut)}
+  .prod h4{font-family:var(--serif);font-size:clamp(28px,2.4vw,34px);line-height:1.05;letter-spacing:-.01em;color:var(--text)}
+  .prod p{font-size:16px;color:var(--text-2)}
+  .prod dl{display:grid;grid-template-columns:max-content 1fr;gap:10px 18px;font-size:15px;border-top:1px solid var(--line);padding-top:16px;margin-top:4px}
+  .prod dt{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);padding-top:3px}
+  .prod dd{color:var(--text-2)}
+  .prod-links{margin-top:auto;padding-top:16px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px 24px}
+  .prods.single{grid-template-columns:1fr}
+  .prods.single .prod-media{background:var(--ink);aspect-ratio:16/8}
+  @media (min-width:1240px){
+    .prods.single .prod{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+    .prods.single .prod-media{aspect-ratio:auto;border-bottom:0;border-right:1px solid var(--line);display:grid;place-items:center}
+  }
+  @media (hover:hover) and (pointer:fine){
+    .prod:hover .prod-media img,.prod:hover .prod-media svg{transform:scale(1.025)}
+  }
+
+  /* acordeão "o que o documento entrega" */
+  .prod details{border-top:1px solid var(--line);padding-top:14px}
+  .prod summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:600;font-size:15px;color:var(--text)}
+  .prod summary::-webkit-details-marker{display:none}
+  .plus{position:relative;width:22px;height:22px;border-radius:50%;border:1px solid var(--line-2);flex:none;transition:transform 240ms var(--ease-out),background-color .2s ease}
+  .plus::before,.plus::after{content:"";position:absolute;left:50%;top:50%;width:9px;height:1.5px;background:currentColor;transform:translate(-50%,-50%)}
+  .plus::after{transform:translate(-50%,-50%) rotate(90deg)}
+  .prod details[open] .plus{transform:rotate(45deg);background:var(--surface-2)}
+  .prod details::details-content{block-size:0;overflow:hidden;transition:block-size 320ms var(--ease-out),content-visibility 320ms allow-discrete}
+  .prod details[open]::details-content{block-size:auto}
+  .prod details ul{margin-top:12px;display:grid;gap:8px;font-size:15px;color:var(--text-2)}
+  .prod details li{position:relative;padding-left:20px}
+  .prod details li::before{content:"";position:absolute;left:2px;top:.72em;width:8px;height:1px;background:var(--amber-ink)}
+
+  /* projeto em destaque */
+  .feature-media{position:relative;overflow:hidden;border-radius:calc(var(--radius) + 4px);aspect-ratio:16/8.4;background:var(--ink)}
+  .feature-media img{width:100%;height:100%;object-fit:cover;object-position:62% 38%}
+  .feature-badge{position:absolute;left:clamp(14px,2vw,24px);top:clamp(14px,2vw,24px);display:inline-flex;align-items:center;gap:10px;padding:8px 14px 8px 10px;border-radius:999px;background:rgba(11,19,21,.72);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:var(--on-ink);font-size:13.5px;font-weight:500;border:1px solid rgba(255,255,255,.1)}
+  .feature-badge i{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--amber);color:var(--ink);font-style:normal;font-size:12px}
+  .feature-body{margin-top:clamp(36px,4vw,56px);row-gap:32px}
+  .feature-aside{grid-column:1/4;display:grid;gap:18px;align-content:start}
+  .feature-aside div{border-top:1px solid var(--line);padding-top:12px}
+  .feature-aside dt{color:var(--mut)}
+  .feature-aside dd{margin-top:6px;font-size:15px;color:var(--text)}
+  .feature-text{grid-column:4/11;display:grid;gap:18px}
+  .feature-text h3{font-family:var(--serif);font-size:clamp(38px,4.6vw,68px);line-height:.98;letter-spacing:-.02em}
+  .award{display:inline-flex;align-items:center;gap:10px;font-weight:600;color:var(--amber-ink)}
+  .feature-text p{color:var(--text-2);max-width:62ch}
+  .feature-links{display:flex;flex-wrap:wrap;gap:10px 28px;margin-top:6px}
+
+  /* acadêmico */
+  .cards-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--gap);align-items:start}
+
+  /* paralelos */
+  .side-note{grid-column:4/10;color:var(--text-2);margin-bottom:clamp(40px,5vw,64px);font-size:18px}
+  .side{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--gap)}
+  .mini{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;transition:border-color .2s ease,transform 160ms var(--ease-out)}
+  a.mini:active{transform:scale(.985)}
+  .mini .cover{aspect-ratio:4/3;overflow:hidden;border-bottom:1px solid var(--line);background:#fff}
+  .mini .cover svg,.mini .cover img{width:100%;height:100%;object-fit:cover;transition:transform 700ms var(--ease-out)}
+  .mini .cover img{object-fit:contain;padding:8px}
+  .mini .meta{padding:18px 18px 20px;display:flex;flex-direction:column;gap:8px;flex:1}
+  .mini .area{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut)}
+  .mini b{font-family:var(--serif);font-weight:400;font-size:25px;line-height:1.05;letter-spacing:-.005em}
+  .mini .txt{font-size:14.5px;line-height:1.5;color:var(--text-2)}
+  .mini .st{margin-top:auto;padding-top:10px;display:flex;align-items:center;justify-content:space-between;font-size:13.5px;font-weight:600;color:var(--teal-ink)}
+  .mini .st.muted{color:var(--mut);font-weight:500}
+  .mini .st .arr{display:inline-block;transition:transform 200ms var(--ease-out)}
+  @media (hover:hover) and (pointer:fine){
+    a.mini:hover{border-color:var(--line-2)}
+    a.mini:hover .cover svg,a.mini:hover .cover img{transform:scale(1.03)}
+    a.mini:hover .st .arr{transform:translate(2px,-2px)}
+  }
+
+  /* competências */
+  .skills{border-top:1px solid var(--line-2)}
+  .skill{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gap);padding:clamp(22px,2.6vw,32px) 0;border-bottom:1px solid var(--line);align-items:baseline}
+  .skill .n{grid-column:1/4;color:var(--mut)}
+  .skill h3{grid-column:4/8;font-family:var(--serif);font-size:clamp(28px,2.8vw,40px);line-height:1;letter-spacing:-.01em}
+  .skill p{grid-column:8/-1;color:var(--text-2);font-size:16px}
+
+  /* formação */
+  .edu{border-top:1px solid var(--line-2)}
+  .edu-row{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gap);padding:clamp(24px,3vw,36px) 0;border-bottom:1px solid var(--line);align-items:baseline}
+  .edu-row .y{grid-column:1/4;color:var(--mut)}
+  .edu-row h3{font-family:var(--serif);font-size:clamp(28px,2.8vw,40px);line-height:1.02;letter-spacing:-.01em}
+  .edu-row .main{grid-column:4/10}
+  .edu-row .main p{margin-top:8px;color:var(--text-2)}
+  .edu-row .st{grid-column:10/-1;justify-self:end;display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:500;color:var(--amber-ink);background:rgba(232,163,61,.14);border-radius:999px;padding:5px 12px}
+  .certs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gap);margin-top:clamp(40px,5vw,64px)}
+  .cert{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px;display:flex;flex-direction:column;gap:8px}
+  .cert .k{color:var(--mut)}
+  .cert b{font-weight:600;line-height:1.35}
+  .cert small{color:var(--mut);font-size:14px}
+  .lang{display:grid;gap:12px;margin-top:4px}
+  .lang div{display:grid;grid-template-columns:84px 1fr auto;align-items:center;gap:12px;font-size:15px}
+  .lang em{font-style:normal;font-size:12.5px;color:var(--mut)}
+  .meter{height:4px;background:rgba(18,26,28,.1);border-radius:4px;overflow:hidden}
+  .meter i{display:block;height:100%;background:var(--teal);border-radius:4px}
+
+  /* contato */
+  .contact{position:relative;background:var(--ink);color:var(--on-ink);overflow:hidden;isolation:isolate}
+  .contact::before{content:"";position:absolute;inset:0;background:var(--grain);opacity:.055;z-index:-1}
+  .contact::after{content:"";position:absolute;left:-15%;bottom:-40%;width:70vw;height:70vw;max-width:900px;max-height:900px;background:radial-gradient(closest-side,rgba(232,163,61,.12),transparent 70%);z-index:-2}
+  .contact .container{padding-top:var(--section);padding-bottom:32px}
+  .contact .sec-index{color:var(--on-ink-mut);border-top:1px solid var(--line-ink);padding-top:20px}
+  .contact .sec-index b{color:var(--on-ink)}
+  .contact-title{font-family:var(--serif);font-size:clamp(64px,12vw,184px);line-height:.88;letter-spacing:-.03em;margin:clamp(32px,5vw,64px) 0 clamp(28px,4vw,48px)}
+  .contact-title em{color:var(--amber)}
+  .contact-grid{align-items:end;row-gap:40px}
+  .contact .lede{grid-column:1/6;color:var(--on-ink-2);font-size:clamp(17px,1.4vw,19px);max-width:46ch}
+  .contact-list{grid-column:7/-1;border-top:1px solid var(--line-ink)}
+  .c-row{display:grid;grid-template-columns:110px 1fr auto;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid var(--line-ink)}
+  .c-row .k{color:var(--on-ink-mut)}
+  .c-row .v{font-size:clamp(17px,1.6vw,21px);font-weight:500;word-break:break-word;color:var(--on-ink)}
+  a.c-row .v{transition:color .2s ease}
+  a.c-row .arr{display:inline-block;color:var(--on-ink-mut);transition:transform 200ms var(--ease-out),color .2s ease}
+  @media (hover:hover) and (pointer:fine){
+    a.c-row:hover .v{color:#fff}
+    a.c-row:hover .arr{transform:translate(2px,-2px);color:var(--amber)}
+  }
+  .copy{height:34px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,.18);font-size:13px;font-weight:500;color:var(--on-ink);white-space:nowrap;transition:transform 160ms var(--ease-out),border-color .2s ease,background-color .2s ease}
+  .copy:active{transform:scale(.96)}
+  .copy.done{border-color:rgba(91,196,160,.5);background:rgba(91,196,160,.1)}
+  .copy .lbl{display:inline-block;transition:filter 150ms ease,opacity 150ms ease}
+  .copy .lbl.swap{filter:blur(2px);opacity:0}
+  @media (hover:hover) and (pointer:fine){.copy:hover{border-color:rgba(255,255,255,.4)}}
+  .site-footer{margin-top:clamp(72px,10vw,128px);padding-top:24px;border-top:1px solid var(--line-ink);display:flex;justify-content:space-between;align-items:center;gap:12px 24px;flex-wrap:wrap;color:var(--on-ink-mut);font-size:14px}
+  .site-footer .clock{display:inline-flex;align-items:center;gap:8px}
+  .site-footer .clock i{width:6px;height:6px;border-radius:50%;background:#5BC4A0}
+  .site-footer a{color:var(--on-ink-2);transition:color .2s ease}
+  @media (hover:hover) and (pointer:fine){.site-footer a:hover{color:#fff}}
+
+  /* =========================================================
+     Revelação de imagens (uma vez, só imagens)
+     ========================================================= */
+  .js .reveal{clip-path:inset(0 0 100% 0);transition:clip-path 900ms var(--ease-in-out)}
+  .js .reveal.in{clip-path:inset(0 0 0 0)}
+  .js .reveal img:not(.parallax),.js .reveal>svg{scale:1.08;transition:scale 1300ms var(--ease-out),transform 700ms var(--ease-out)}
+  .js .reveal.in img:not(.parallax),.js .reveal.in>svg{scale:1}
+  @supports (animation-timeline: view()){
+    .parallax{animation:drift linear both;animation-timeline:view();animation-range:cover}
+    @keyframes drift{from{transform:translateY(-5%) scale(1.12)}to{transform:translateY(5%) scale(1.12)}}
+  }
+
+  /* =========================================================
+     Movimento reduzido: menos e mais suave, não zero
+     ========================================================= */
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    .hero-title .line>span,.hero-copy>*,.chart,.pt,.outlier circle{animation:fade 400ms ease both!important}
+    .fit{animation:fade 400ms ease both}
+    .band,.outlier .note,.hero-meta{animation:fade 400ms ease both}
+    .js .reveal{clip-path:none;opacity:0;transition:opacity 500ms ease}
+    .js .reveal.in{opacity:1}
+    .js .reveal img:not(.parallax),.js .reveal>svg{scale:1}
+    .parallax{animation:none!important;transform:none}
+    .sheet{transform:none}
+    .prod details::details-content{transition:none}
+  }
+  @media print{.js .reveal{clip-path:none}.site-header,.progress,.sheet{display:none}}
+
+  /* =========================================================
+     Responsivo
+     ========================================================= */
+  @media (max-width:1100px){
+    .side{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .stats{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:40px}
+  }
+  @media (max-width:960px){
+    .hero-copy,.chart{grid-column:1/-1}
+    .chart{max-width:640px}
+    .hero-inner{min-height:auto}
+    .hero-meta .sp{margin-left:0}
+    .sec-index{grid-column:1/-1;margin-bottom:16px}
+    .sec-title,.col-main,.about-body,.stats,.side-note{grid-column:1/-1}
+    .job-meta{grid-column:1/-1;position:static;margin-bottom:28px}
+    .job-body{grid-column:1/-1}
+    .feature-aside{grid-column:1/-1;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gap)}
+    .feature-text{grid-column:1/-1}
+    .contact .lede,.contact-list{grid-column:1/-1}
+    .skill .n,.edu-row .y{grid-column:1/-1;margin-bottom:10px}
+    .skill h3{grid-column:1/6}
+    .skill p{grid-column:6/-1}
+    .edu-row .main{grid-column:1/9}
+    .edu-row .st{grid-column:9/-1}
+  }
+  @media (max-width:760px){
+    body{font-size:16px}
+    .prods,.cards-2,.certs{grid-template-columns:1fr}
+    .feature-media{aspect-ratio:4/5}
+    .feature-aside{grid-template-columns:1fr}
+    .skill h3,.skill p,.edu-row .main,.edu-row .st{grid-column:1/-1}
+    .skill p{margin-top:10px}
+    .edu-row .st{justify-self:start;margin-top:14px}
+    .hero-meta .hide-sm{display:none}
+    .bar{padding-left:16px}
+  }
+  @media (max-width:520px){
+    .side,.stats{grid-template-columns:1fr}
+    .stats{row-gap:28px}
+    .c-row{grid-template-columns:1fr auto;row-gap:4px}
+    .c-row .k{grid-column:1/-1}
+    .hero-actions .btn{flex:1 1 auto;padding:0 18px}
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#conteudo">Pular para o conteúdo</a>
+<div class="progress" aria-hidden="true"></div>
+
+<!-- ================= HEADER ================= -->
+<header class="site-header">
+  <div class="container">
+    <div class="bar">
+      <a class="brand" href="#topo" aria-label="Francisco Iago, início"><b>Francisco Iago<span>.</span></b></a>
+      <nav class="nav" aria-label="Seções">
+        <ul class="nav-list">
+          <li><a href="#sobre">Sobre</a></li>
+          <li><a href="#trajetoria">Trajetória</a></li>
+          <li><a href="#projetos">Projetos</a></li>
+          <li><a href="#academico">Acadêmico</a></li>
+          <li><a href="#paralelos">Paralelos</a></li>
+          <li><a href="#competencias">Competências</a></li>
+          <li><a href="#formacao">Formação</a></li>
+        </ul>
+        <div class="nav-active" aria-hidden="true">
+          <span>Sobre</span><span>Trajetória</span><span>Projetos</span><span>Acadêmico</span><span>Paralelos</span><span>Competências</span><span>Formação</span>
+        </div>
+      </nav>
+      <a class="header-cta" href="#contato">Contato</a>
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu"><i aria-hidden="true"></i><span>Menu</span></button>
+    </div>
+  </div>
+</header>
+
+<div class="sheet" id="menu" inert>
+  <nav aria-label="Menu">
+    <ol>
+      <li><a href="#sobre">Sobre</a></li>
+      <li><a href="#trajetoria">Trajetória</a></li>
+      <li><a href="#projetos">Projetos</a></li>
+      <li><a href="#academico">Acadêmico</a></li>
+      <li><a href="#paralelos">Paralelos</a></li>
+      <li><a href="#competencias">Competências</a></li>
+      <li><a href="#formacao">Formação</a></li>
+      <li><a href="#contato">Contato</a></li>
+    </ol>
+  </nav>
+  <div class="sheet-foot"><span>estat.iago.unb@gmail.com</span><span>Brasília/DF</span></div>
+</div>
+
+<!-- ================= HERO ================= -->
+<section class="hero" id="topo">
+  <div class="container hero-inner">
+    <div class="hero-meta mono">
+      <span class="status"><i aria-hidden="true"></i>Disponível para vagas e consultorias</span>
+      <span>Brasília, DF <span class="hide-sm">· 15°47′S 47°52′O</span></span>
+      <span class="sp hide-sm">Portfólio profissional · 2026</span>
+    </div>
+
+    <h1 class="hero-title">
+      <span class="line"><span style="--d:60ms">Francisco Iago</span></span>
+      <span class="line"><span style="--d:170ms"><em>dos R. Ferreira</em></span></span>
+    </h1>
+
+    <div class="grid hero-grid">
+      <div class="hero-copy">
+        <p class="hero-role" style="--d:380ms">Estatístico (UnB) e analista de dados. <span>Das bases e pipelines até o modelo, o indicador e o relatório que chega a quem decide.</span></p>
+        <ul class="hero-tags" style="--d:450ms" aria-label="Áreas de atuação">
+          <li>Engenharia de dados</li><li>Modelagem estatística</li><li>Machine learning</li><li>Business Intelligence</li><li>Planos amostrais</li>
+        </ul>
+        <div class="hero-actions" style="--d:520ms">
+          <a class="btn primary" href="#projetos">Ver projetos <span class="arr down" aria-hidden="true">↓</span></a>
+          <a class="btn ghost" href="#contato">Entrar em contato</a>
+        </div>
+      </div>
+
+      <figure class="chart" aria-label="Ilustração: regressão linear com intervalo de confiança de 95%">
+        <figcaption class="chart-cap"><b>ŷ = 0,57 + 0,67x</b><span>IC 95% · n = 34</span></figcaption>
+        <svg viewBox="0 0 400 260" role="img" aria-hidden="true">
+          <g class="gridl">
+            <line x1="30" y1="40" x2="390" y2="40"/><line x1="30" y1="95" x2="390" y2="95"/>
+            <line x1="30" y1="150" x2="390" y2="150"/><line x1="30" y1="205" x2="390" y2="205"/>
+          </g>
+          <line class="axis" x1="30" y1="230" x2="390" y2="230"/>
+          <line class="axis" x1="30" y1="20" x2="30" y2="230"/>
+          <text x="30" y="246" text-anchor="middle">0</text><text x="210" y="246" text-anchor="middle">5</text><text x="390" y="246" text-anchor="middle">10</text>
+          <path class="band" d="M30 205 L390 58 L390 98 L30 232 Z"/>
+          <g id="pts"></g>
+          <path class="fit" pathLength="1" d="M30 218 L390 78"/>
+          <g class="outlier">
+            <circle class="ring" cx="292" cy="52" r="10"/>
+            <circle cx="292" cy="52" r="4.5"/>
+            <text class="note" x="306" y="40">outlier</text>
+          </g>
+          <g class="cross" id="cross">
+            <line class="h" x1="0" y1="0" x2="0" y2="0"/>
+            <line class="v" x1="0" y1="20" x2="0" y2="230"/>
+            <circle class="dot" cx="0" cy="0" r="5"/>
+            <g class="lbl"><rect x="0" y="0" width="112" height="22" rx="5"/><text x="9" y="15"></text></g>
+          </g>
+        </svg>
+        <div class="chart-legend"><span><i style="background:var(--teal)"></i>observado</span><span><i style="background:var(--amber)"></i>ajuste</span><span><i style="background:var(--coral)"></i>outlier</span><span class="hint">↔ passe o cursor</span></div>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<main id="conteudo">
+
+<!-- ================= SOBRE ================= -->
+<section class="section" id="sobre">
+  <div class="container">
+    <header class="grid sec-head">
+      <span class="sec-index mono"><b>01</b>/ 07</span>
+      <h2 class="sec-title">Sobre mim</h2>
+    </header>
+    <div class="grid">
+      <p class="lead col-main">Sou estatístico e transformo <em>dados brutos em evidência para decisão</em>: das bases e pipelines até o modelo, o indicador e o relatório.</p>
+      <div class="about-body">
+        <p>Formado em Estatística pela Universidade de Brasília, atuo há mais de quatro anos com dados no setor público, primeiro no Judiciário (TRT da 10ª Região) e hoje no Ministério da Saúde, onde analiso os dados do Sistema GAL para a Rede Nacional de Laboratórios de Saúde Pública.</p>
+        <p>Meu trabalho combina engenharia de dados (ETL em Python, R e SQL, qualidade e linkage de bases, conformidade com a LGPD), modelagem estatística e machine learning, desenho de planos amostrais e visualização em Power BI e Tableau.</p>
+        <p>Busco aplicar esse repertório em <strong>consultorias de análise e avaliação</strong> para além da saúde, como finanças, educação, gênero e outras políticas públicas, e em times de dados que precisem de rigor estatístico.</p>
+      </div>
+      <dl class="stats">
+        <div class="stat"><dt class="tnum">4+</dt><dd>anos com dados no setor público</dd></div>
+        <div class="stat"><dt class="tnum">11,8 mi</dt><dd>exames no diagnóstico nacional de qualidade laboratorial</dd></div>
+        <div class="stat"><dt class="tnum">5.570</dt><dd>municípios na análise espacial de dengue</dd></div>
+        <div class="stat"><dt class="tnum">2026</dt><dd>Melhor Projeto da turma do IDASH (UW / CDC)</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TRAJETÓRIA ================= -->
+<section class="section" id="trajetoria">
+  <div class="container">
+    <header class="grid sec-head">
+      <span class="sec-index mono"><b>02</b>/ 07</span>
+      <h2 class="sec-title">Trajetória</h2>
+    </header>
+
+    <div class="jobs">
+      <article class="job">
+        <div class="job-meta">
+          <span class="job-num mono">01 · Poder Judiciário</span>
+          <h3 class="job-title">Tribunal Regional do Trabalho da 10ª Região</h3>
+          <p class="job-pos">Estagiário em Pesquisa e Estatística</p>
+          <p class="job-when">Brasília · 2021 – 2023</p>
+        </div>
+        <div class="job-body">
+          <div class="job-desc">
+            <p>Desenvolvi e mantive painéis de Business Intelligence em Tableau, alimentados pelo sistema e-Gestão, para monitorar a produção judiciária.</p>
+            <p>Automatizei em R as rotinas de processamento de dados, o que reduziu o tempo de execução e eliminou erros manuais.</p>
+            <p>Também analisei esses dados para produzir relatórios, planilhas e gráficos de apoio à decisão.</p>
+          </div>
+          <h4 class="sub mono">Entregas</h4>
+          <div class="prods single">
+            <article class="prod">
+              <div class="prod-media reveal">
+                <svg viewBox="0 0 520 300" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                  <rect width="520" height="300" fill="#0B1315"/>
+                  <text x="36" y="56" font-family="Geist Mono,monospace" font-size="11" fill="#7E8A88">ranking IGEST · simulação</text>
+                  <g font-family="Geist Mono,monospace" font-size="11">
+                    <rect x="36" y="76"  width="300" height="26" rx="4" fill="#ffffff0d"/><text x="48" y="93" fill="#cfd8d6">1º  Vara A</text><rect x="250" y="83" width="76" height="12" rx="2" fill="#2A8A7E"/>
+                    <rect x="36" y="108" width="300" height="26" rx="4" fill="#ffffff0d"/><text x="48" y="125" fill="#cfd8d6">2º  Vara B</text><rect x="250" y="115" width="64" height="12" rx="2" fill="#2A8A7E"/>
+                    <rect x="36" y="140" width="300" height="26" rx="4" fill="#E8A33D"/><text x="48" y="157" fill="#0B1315">3º  Sua vara ↑5</text><rect x="250" y="147" width="58" height="12" rx="2" fill="#0B1315"/>
+                    <rect x="36" y="172" width="300" height="26" rx="4" fill="#ffffff0d"/><text x="48" y="189" fill="#cfd8d6">4º  Vara C</text><rect x="250" y="179" width="50" height="12" rx="2" fill="#2A8A7E"/>
+                    <rect x="36" y="204" width="300" height="26" rx="4" fill="#ffffff0d"/><text x="48" y="221" fill="#cfd8d6">5º  Vara D</text><rect x="250" y="211" width="42" height="12" rx="2" fill="#2A8A7E"/>
+                  </g>
+                  <g font-family="Geist Mono,monospace" font-size="10" fill="#7E8A88">
+                    <text x="368" y="94">acervo</text><rect x="368" y="100" width="116" height="6" rx="3" fill="#ffffff20"/><rect x="368" y="100" width="70" height="6" rx="3" fill="#E8A33D"/><circle cx="438" cy="103" r="6" fill="#E8A33D"/>
+                    <text x="368" y="138">produtividade</text><rect x="368" y="144" width="116" height="6" rx="3" fill="#ffffff20"/><rect x="368" y="144" width="90" height="6" rx="3" fill="#E8A33D"/><circle cx="458" cy="147" r="6" fill="#E8A33D"/>
+                    <text x="368" y="182">celeridade</text><rect x="368" y="188" width="116" height="6" rx="3" fill="#ffffff20"/><rect x="368" y="188" width="48" height="6" rx="3" fill="#E8A33D"/><circle cx="416" cy="191" r="6" fill="#E8A33D"/>
+                  </g>
+                </svg>
+              </div>
+              <div class="prod-body">
+                <span class="tag">TRT da 10ª Região · 2022 · revisado em 2026</span>
+                <h4>Simulador do ranking IGEST</h4>
+                <p>Aplicativo em Shiny que simula a posição de cada vara do trabalho no ranking nacional do IGEST a partir dos valores informados pelo usuário. Na revisão, reimplementei o cálculo seguindo o manual da CGJT, corrigi três erros de cálculo da primeira versão e levei o simulador para o navegador, com comparação por TRT e por faixa de movimentação.</p>
+                <dl>
+                  <dt>Problema</dt><dd>O painel anterior, em Tableau, era lento e pouco prático para simular cenários</dd>
+                  <dt>Solução</dt><dd>Aplicativo que recalcula o ranking na hora, filtra pelos valores digitados e mostra tudo numa única tela</dd>
+                  <dt>Ferramentas</dt><dd>R, Shiny (2022); Python e JavaScript (revisão)</dd>
+                </dl>
+                <div class="prod-links">
+                  <a class="link-arrow" href="igest/index.html">Abrir o simulador e a revisão <span class="arr" aria-hidden="true">→</span></a>
+                  <a class="link-arrow" href="https://github.com/FerreiraFrancisco/Simulador-IGEST--" target="_blank" rel="noopener">Código da versão 1 no GitHub <span class="arr ne" aria-hidden="true">↗</span></a>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </article>
+
+      <article class="job">
+        <div class="job-meta">
+          <span class="job-num mono">02 · Governo federal</span>
+          <h3 class="job-title">Ministério da Saúde</h3>
+          <p class="job-pos">Consultor Técnico / Analista de Dados<small>SVSA · CGLAB · contrato OPAS/OMS</small></p>
+          <p class="job-when">Brasília · 2024 – atual</p>
+        </div>
+        <div class="job-body">
+          <div class="job-desc">
+            <p>Analiso os dados do Sistema Gerenciador de Ambiente Laboratorial (GAL) para fortalecer a Rede Nacional de Laboratórios de Saúde Pública e monitoro os indicadores laboratoriais que acompanham a produção de exames em toda a rede.</p>
+            <p>Desenvolvo e mantenho os pipelines de dados do GAL em Python, R e SQL: extraio, limpo e relaciono as bases (linkage) e as deixo prontas para painéis e análises, com garantia de qualidade da informação.</p>
+            <p>Faço análises exploratórias para identificar padrões e tendências e transformo os resultados em relatórios técnicos, visualizações e apresentações para a gestão.</p>
+          </div>
+          <h4 class="sub mono">Entregas</h4>
+          <p class="prod-intro">Produtos técnicos elaborados como consultor da OPAS/OMS para a Coordenação-Geral de Laboratórios de Saúde Pública. Cada um parte de uma pergunta de gestão, analisa a base nacional do GAL e termina em recomendações para a rede.</p>
+          <div class="prods">
+
+            <article class="prod">
+              <figure class="prod-media fig reveal">
+                <img src="img/p1-capa.webp" alt="Gráfico de Pareto dos motivos de não conformidade, extraído do produto" loading="lazy" width="1200" height="770">
+                <figcaption>Fig. 1 · Pareto</figcaption>
+              </figure>
+              <div class="prod-body">
+                <span class="tag">Produto 1 · OPAS/OMS · CGLAB · 2026</span>
+                <h4>Qualidade laboratorial: rejeição de amostras e não conformidades em 2025</h4>
+                <p>Diagnóstico nacional de por que amostras são recusadas pelos laboratórios públicos, onde isso se concentra e o que fazer para reduzir as perdas, com foco nas falhas que acontecem antes da análise.</p>
+                <dl>
+                  <dt>Escopo</dt><dd>11,8 milhões de exames, 27 UFs, ano de 2025</dd>
+                  <dt>Métodos</dt><dd>Indicadores de qualidade, análise de Pareto, séries mensais, recortes por UF, exame e laboratório</dd>
+                  <dt>Resultado</dt><dd>Linha de base nacional e recomendações para monitoramento, capacitação e padronização de fluxos</dd>
+                </dl>
+                <details>
+                  <summary>O que o documento entrega <span class="plus" aria-hidden="true"></span></summary>
+                  <ul>
+                    <li>Panorama da rejeição de amostras por região, UF e mês</li>
+                    <li>Ranking dos motivos e categorias de não conformidade</li>
+                    <li>Exames, laboratórios e unidades com maior carga de rejeição</li>
+                    <li>Proposta de indicador mensal de qualidade, com metas por UF</li>
+                    <li>Prioridades de capacitação e apoio técnico por estado</li>
+                  </ul>
+                </details>
+                <div class="prod-links">
+                  <a class="link-arrow" href="produto-1.html">Ver o desenvolvimento do documento <span class="arr" aria-hidden="true">→</span></a>
+                </div>
+              </div>
+            </article>
+
+            <article class="prod">
+              <figure class="prod-media fig reveal">
+                <img src="img/p2-capa.webp" alt="Mapa dos focos de transmissão de dengue por prioridade, extraído do produto" loading="lazy" width="1100" height="1080">
+                <figcaption>Fig. 2 · Focos de transmissão</figcaption>
+              </figure>
+              <div class="prod-body">
+                <span class="tag">Produto 2 · OPAS/OMS · CGLAB · 2026</span>
+                <h4>Focos de transmissão: análise espacial de dengue em 2025</h4>
+                <p>Identificação dos municípios e corredores com transmissão de dengue acima do esperado, a partir dos exames confirmados em laboratório, com uma classificação de prioridade para orientar a temporada seguinte.</p>
+                <dl>
+                  <dt>Escopo</dt><dd>5.570 municípios, exames de dengue do GAL em 2025</dd>
+                  <dt>Métodos</dt><dd>Taxas bayesianas suavizadas, Moran global e LISA, Getis-Ord Gi*, varredura espacial e espaço-temporal de Kulldorff</dd>
+                  <dt>Resultado</dt><dd>Mapa de focos prioritários, leitura da circulação de sorotipos e recomendações de vigilância</dd>
+                </dl>
+                <details>
+                  <summary>O que o documento entrega <span class="plus" aria-hidden="true"></span></summary>
+                  <ul>
+                    <li>Distribuição temporal, estadual e municipal dos casos confirmados</li>
+                    <li>Aglomerados espaciais e a dinâmica de difusão da onda ao longo do ano</li>
+                    <li>Distribuição espacial dos sorotipos do vírus</li>
+                    <li>Lista de municípios classificados por prioridade</li>
+                    <li>Recomendações sobre insumos, testagem e vigilância genômica</li>
+                  </ul>
+                </details>
+                <div class="prod-links">
+                  <a class="link-arrow" href="produto-2.html">Ver o desenvolvimento do documento <span class="arr" aria-hidden="true">→</span></a>
+                </div>
+              </div>
+            </article>
+
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PROJETO EM DESTAQUE ================= -->
+<section class="section" id="projetos">
+  <div class="container">
+    <header class="grid sec-head">
+      <span class="sec-index mono"><b>03</b>/ 07</span>
+      <h2 class="sec-title">Projeto em <em>destaque</em></h2>
+    </header>
+
+    <article class="feature">
+      <figure class="feature-media reveal">
+        <img class="parallax" src="img/sds-idash.webp" alt="Francisco Iago apresentando o SDS na feira de projetos do IDASH, em Santiago" width="1280" height="852">
+        <figcaption class="feature-badge"><i aria-hidden="true">★</i>Melhor Projeto · IDASH 2026</figcaption>
+      </figure>
+      <div class="grid feature-body">
+        <dl class="feature-aside">
+          <div><dt class="mono">Programa</dt><dd>Informatics and Data Science for Health (IDASH)</dd></div>
+          <div><dt class="mono">Parceria</dt><dd>University of Washington e CDC</dd></div>
+          <div><dt class="mono">Ferramentas</dt><dd>Python, séries temporais, machine learning</dd></div>
+        </dl>
+        <div class="feature-text">
+          <h3>SDS: previsão de surtos de arboviroses</h3>
+          <p class="award">Eleito Melhor Projeto da turma de 2026 do IDASH</p>
+          <p>Projeto final do programa Informatics and Data Science for Health (IDASH), da University of Washington em parceria com o CDC. O SDS antecipa surtos de arboviroses a partir de séries históricas e gera sinais de alerta para orientar a resposta da vigilância.</p>
+          <div class="feature-links">
+            <a class="link-arrow" href="docs/noticia-idash-sds.pdf" target="_blank" rel="noopener">Ler a notícia do Ministério da Saúde (PDF) <span class="arr ne" aria-hidden="true">↗</span></a>
+            <a class="link-arrow" href="https://go2itech.org/education-workforce-development/idash/" target="_blank" rel="noopener">O que é o programa IDASH <span class="arr ne" aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ================= PRODUÇÕES ACADÊMICAS ================= -->
+<section class="section" id="academico">
+  <div class="container">
+    <header class="grid sec-head">
+      <span class="sec-index mono"><b>04</b>/ 07</span>
+      <h2 class="sec-title">Produções <em>acadêmicas</em></h2>
+    </header>
+    <div class="cards-2">
+
+      <article class="prod">
+        <figure class="prod-media photo reveal">
+          <img src="img/tcc-brasileirao.webp" alt="Arte do Campeonato Brasileiro Série A com o troféu e uma bola" loading="lazy" width="1024" height="682">
+        </figure>
+        <div class="prod-body">
+          <span class="tag">Trabalho de conclusão de curso · UnB · 2023 · revisado em 2026</span>
+          <h4>O que separa o G6 do Z4 no Brasileirão 2022?</h4>
+          <p>Revisitei meu TCC depois de 3 anos! Corrigi alguns erros, troquei a Análise de Componentes Principais sobre os totais da temporada por uma Análise Fatorial e identifiquei a função tática de cada jogador. A maior diferença entre o G6 e o Z4 está nos pontas, que jogam muito mais no último terço do campo.</p>
+          <dl>
+            <dt>Dados</dt><dd>FBref, 702 jogadores de linha; 246 com mais de 1.180 minutos</dd>
+            <dt>Métodos</dt><dd>Análise fatorial, mistura gaussiana para as funções táticas, Mann-Whitney com correção de Holm</dd>
+            <dt>Ferramentas</dt><dd>Python, Quarto, Plotly</dd>
+            <dt>Orientação</dt><dd>Prof. Gladston Luiz da Silva</dd>
+          </dl>
+          <div class="prod-links">
+            <a class="link-arrow" href="tcc/relatorio.html" target="_blank" rel="noopener">Ler o relatório <span class="arr ne" aria-hidden="true">↗</span></a>
+            <a class="link-arrow" href="tcc/dashboard.html" target="_blank" rel="noopener">Abrir o dashboard <span class="arr ne" aria-hidden="true">↗</span></a>
+            <a class="link-arrow" href="docs/tcc-brasileirao-2022.pdf" target="_blank" rel="noopener">TCC original (PDF) <span class="arr ne" aria-hidden="true">↗</span></a>
+            <a class="link-arrow" href="https://github.com/iagorf04178/TCC1" target="_blank" rel="noopener">Código no GitHub <span class="arr ne" aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+      </article>
+
+      <article class="prod">
+        <figure class="prod-media photo gestante reveal">
+          <img src="img/previne-gestante.webp" alt="Ilustração de uma mulher com as mãos sobre o útero, representando o cuidado com a saúde da mulher" loading="lazy" width="746" height="607">
+        </figure>
+        <div class="prod-body">
+          <span class="tag">Laboratório de Estatística 2 · UnB · 2023</span>
+          <h4>Painel do Previne Brasil no Distrito Federal</h4>
+          <p>Painel com os sete indicadores de desempenho do Previne Brasil para as unidades básicas de saúde do DF, de 2018 a 2023, comparados às metas do programa.</p>
+          <dl>
+            <dt>Ferramenta</dt><dd>Looker Studio</dd>
+            <dt>Equipe</dt><dd>Com Arthur Rodrigues, Ana Carolina Gomez, Daniel Miranda e Rayssa Lorrane</dd>
+          </dl>
+          <div class="prod-links">
+            <a class="link-arrow" href="https://lookerstudio.google.com/u/0/reporting/e36a704f-81d1-4b54-8be3-fa20bae2e246/page/p_kr9ndi57bd" target="_blank" rel="noopener">Abrir o painel <span class="arr ne" aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================= PROJETOS PARALELOS ================= -->
+<section class="section" id="paralelos">
+  <div class="container">
+    <header class="grid sec-head">
+      <span class="sec-index mono"><b>05</b>/ 07</span>
+      <h2 class="sec-title">Projetos <em>paralelos</em></h2>
+    </header>
+    <div class="grid"><p class="side-note col-main">Análises que faço por conta própria, em temas variados, para testar métodos de estatística e ciência de dados fora do meu dia a dia de trabalho.</p></div>
+    <div class="side">
+
+      <a class="mini" href="https://www.kaggle.com/iagoreuuus" target="_blank" rel="noopener">
+        <div class="cover">
+          <svg viewBox="0 0 240 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <rect width="240" height="180" fill="#2F5D3A"/>
+            <g stroke="#ffffff40" stroke-width="1"><line x1="30" y1="20" x2="30" y2="160"/><line x1="60" y1="20" x2="60" y2="160"/><line x1="90" y1="20" x2="90" y2="160"/><line x1="120" y1="20" x2="120" y2="160"/><line x1="150" y1="20" x2="150" y2="160"/><line x1="180" y1="20" x2="180" y2="160"/><line x1="210" y1="20" x2="210" y2="160"/></g>
+            <g fill="#F3EFE7"><circle cx="70" cy="60" r="4"/><circle cx="72" cy="90" r="4"/><circle cx="68" cy="120" r="4"/><circle cx="96" cy="78" r="4"/></g>
+            <g fill="#E8A33D"><circle cx="112" cy="64" r="4"/><circle cx="118" cy="96" r="4"/><circle cx="110" cy="128" r="4"/><circle cx="140" cy="88" r="4"/></g>
+            <path d="M96 78 C120 60 150 50 186 44" stroke="#F3EFE7" stroke-width="2" stroke-dasharray="4 4" fill="none"/>
+          </svg>
+        </div>
+        <div class="meta"><span class="area">Esporte · Kaggle</span><b>NFL Big Data Bowl 2027</b><span class="txt">Dados de rastreamento de jogadores analisados com a lógica do Moneyball. Código em R.</span><span class="st">Em andamento <span class="arr" aria-hidden="true">↗</span></span></div>
+      </a>
+
+      <a class="mini" href="https://github.com/FerreiraFrancisco/Forecast-2334" target="_blank" rel="noopener">
+        <div class="cover"><img src="img/previsao.webp" alt="Diagnóstico de resíduos do modelo SARIMA" loading="lazy" width="900" height="650"></div>
+        <div class="meta"><span class="area">Séries temporais</span><b>Qual é a melhor previsão?</b><span class="txt">SARIMA escolhido à mão, modelo automático e Prophet comparados numa série da competição M3.</span><span class="st">Código no GitHub <span class="arr" aria-hidden="true">↗</span></span></div>
+      </a>
+
+      <a class="mini" href="https://www.kaggle.com/code/iagoreuuus/testeab-portfolio" target="_blank" rel="noopener">
+        <div class="cover">
+          <svg viewBox="0 0 240 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <rect width="240" height="180" fill="#F3EFE7"/>
+            <text x="24" y="34" font-family="Geist Mono,monospace" font-size="10" fill="#687174">% de respostas "sim"</text>
+            <rect x="54" y="70" width="46" height="80" rx="2" fill="#3F4C8A"/><rect x="140" y="58" width="46" height="92" rx="2" fill="#D0603F"/>
+            <g stroke="#0B1315" stroke-width="2"><line x1="77" y1="58" x2="77" y2="84"/><line x1="70" y1="58" x2="84" y2="58"/><line x1="70" y1="84" x2="84" y2="84"/><line x1="163" y1="44" x2="163" y2="72"/><line x1="156" y1="44" x2="170" y2="44"/><line x1="156" y1="72" x2="170" y2="72"/></g>
+            <line x1="30" y1="150" x2="210" y2="150" stroke="#0B131560"/>
+            <g font-family="Geist Mono,monospace" font-size="10" fill="#0B1315"><text x="56" y="166">controle</text><text x="144" y="166">exposto</text></g>
+          </svg>
+        </div>
+        <div class="meta"><span class="area">Marketing · Kaggle</span><b>Teste A/B de campanha publicitária</b><span class="txt">Teste de diferença de proporções para saber se o anúncio mudou a resposta do público.</span><span class="st">Notebook no Kaggle <span class="arr" aria-hidden="true">↗</span></span></div>
+      </a>
+
+      <div class="mini">
+        <div class="cover">
+          <svg viewBox="0 0 240 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <rect width="240" height="180" fill="#0B1315"/>
+            <g id="candles"></g>
+          </svg>
+        </div>
+        <div class="meta"><span class="area">Mercado financeiro</span><b>Bolsa de valores</b><span class="txt">Retornos, volatilidade e risco de ações brasileiras com dados públicos.</span><span class="st muted">Em preparação</span></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================= COMPETÊNCIAS ================= -->
+<section class="section" id="competencias">
+  <div class="container">
+    <header class="grid sec-head">
+      <span class="sec-index mono"><b>06</b>/ 07</span>
+      <h2 class="sec-title">Competências</h2>
+    </header>
+    <ol class="skills">
+      <li class="skill"><span class="n mono">01</span><h3>Linguagens</h3><p>Python, R e SQL avançado. Jupyter Notebooks, Shinydashboard.</p></li>
+      <li class="skill"><span class="n mono">02</span><h3>Engenharia de dados</h3><p>Pipelines ETL/ELT, limpeza e qualidade de dados, linkage de bases, LGPD.</p></li>
+      <li class="skill"><span class="n mono">03</span><h3>Estatística</h3><p>Modelagem estatística, inferência, planos amostrais, análise exploratória, séries temporais.</p></li>
+      <li class="skill"><span class="n mono">04</span><h3>Machine learning</h3><p>Regressão, classificação, clustering, árvores de decisão, SVM, avaliação e validação de modelos. Scikit-learn.</p></li>
+      <li class="skill"><span class="n mono">05</span><h3>Deep learning e IA</h3><p>Redes neurais (CNN, RNN), NLP, visão computacional, IA generativa, LLMs e RAG. TensorFlow, Keras, PyTorch.</p></li>
+      <li class="skill"><span class="n mono">06</span><h3>Visualização e BI</h3><p>Power BI, Tableau, Looker Studio, Matplotlib, Seaborn. Cloud e MLOps: IBM Cloud, Watson, Docker (básico).</p></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ================= FORMAÇÃO ================= -->
+<section class="section" id="formacao">
+  <div class="container">
+    <header class="grid sec-head">
+      <span class="sec-index mono"><b>07</b>/ 07</span>
+      <h2 class="sec-title">Formação</h2>
+    </header>
+    <div class="edu">
+      <div class="edu-row">
+        <span class="y mono tnum">2025 – 2026</span>
+        <div class="main"><h3>Informatics and Data Science for Health (IDASH)</h3><p>University of Washington / CDC</p></div>
+        <span class="st"><span aria-hidden="true">★</span> Melhor Projeto 2026</span>
+      </div>
+      <div class="edu-row">
+        <span class="y mono tnum">2016 – 2023</span>
+        <div class="main"><h3>Bacharelado em Estatística</h3><p>Universidade de Brasília (UnB)</p></div>
+      </div>
+    </div>
+
+    <div class="certs">
+      <div class="cert"><span class="k mono">Certificado</span><b>IBM Data Science Professional Certificate</b><small>IBM / Coursera · em andamento</small></div>
+      <div class="cert"><span class="k mono">Certificado</span><b>IBM AI Engineering Professional Certificate</b><small>IBM / Coursera · em andamento</small></div>
+      <div class="cert">
+        <span class="k mono">Idiomas</span>
+        <div class="lang">
+          <div><span>Português</span><span class="meter"><i style="width:100%"></i></span><em>Nativo</em></div>
+          <div><span>Inglês</span><span class="meter"><i style="width:62%"></i></span><em>Intermediário</em></div>
+          <div><span>Espanhol</span><span class="meter"><i style="width:62%"></i></span><em>Intermediário</em></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ================= CONTATO ================= -->
+<section class="contact" id="contato">
+  <div class="container">
+    <span class="sec-index mono" style="display:flex"><b>Contato</b></span>
+    <h2 class="contact-title">Vamos <em>conversar?</em></h2>
+    <div class="grid contact-grid">
+      <p class="lede">Estou disponível para vagas em dados (presencial em Brasília ou remoto) e para consultorias de análise, monitoramento e avaliação.</p>
+      <div class="contact-list">
+        <div class="c-row">
+          <span class="k mono">E-mail</span>
+          <a class="v" href="mailto:estat.iago.unb@gmail.com">estat.iago.unb@gmail.com</a>
+          <button class="copy" type="button" data-copy="estat.iago.unb@gmail.com"><span class="lbl">Copiar</span></button>
+        </div>
+        <a class="c-row" href="https://www.linkedin.com/in/francisco-ferreira-b0abb222b/" target="_blank" rel="noopener">
+          <span class="k mono">LinkedIn</span><span class="v">francisco-ferreira-b0abb222b</span><span class="arr" aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </div>
+    <span class="sr-live" aria-live="polite" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)"></span>
+    <footer class="site-footer">
+      <span>Francisco Iago dos Reis Ferreira · Estatístico</span>
+      <span class="clock tnum"><i aria-hidden="true"></i>Brasília · <time id="clock">--:--</time></span>
+      <a href="#topo">Voltar ao topo ↑</a>
+    </footer>
+  </div>
+</section>
+
+<script>
+(function(){
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  /* ---------- Pontos do gráfico (determinísticos) ----------
+     Atrasos com ease-out: os intervalos encolhem ao longo do grupo,
+     então a entrada lê como uma onda, não como um metrônomo. */
+  var g = document.getElementById('pts');
+  if (g) {
+    var s = 7, n = 34, out = '';
+    var r = function(){ s = (s*9301 + 49297) % 233280; return s/233280; };
+    for (var i = 0; i < n; i++) {
+      var x = 40 + i*10.4 + r()*6, yl = 218 - (x-30)*(140/360), y = yl + (r()-.5)*44;
+      var t = i/(n-1), d = Math.round(400 + 640*(1 - Math.pow(1-t, 2.2)));
+      out += '<circle class="pt" style="--d:' + d + 'ms" cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="3.6"/>';
+    }
+    g.innerHTML = out;
+  }
+
+  /* ---------- Leitura da reta ajustada sob o cursor ----------
+     Decorativo e explicativo: só em ponteiro fino; segue com
+     interpolação amortecida (sensação de mola), sem React/libs. */
+  var svg = document.querySelector('.chart svg'), cross = document.getElementById('cross');
+  if (svg && cross && finePointer) {
+    var h = cross.querySelector('.h'), dot = cross.querySelector('.dot'),
+        lbl = cross.querySelector('.lbl'), txt = lbl.querySelector('text');
+    var target = null, cur = null, raf = 0;
+    var fmt = function(v){ return v.toFixed(2).replace('.', ','); };
+    var render = function(x){
+      var y = 218 - (x-30)*(140/360);
+      var X = (x-30)/36, Y = (230-y)/21;
+      cross.setAttribute('transform', 'translate(' + x.toFixed(2) + ' 0)');
+      dot.setAttribute('cy', y.toFixed(2));
+      h.setAttribute('x1', (30-x).toFixed(2)); h.setAttribute('y1', y.toFixed(2)); h.setAttribute('y2', y.toFixed(2));
+      txt.textContent = 'x ' + fmt(X) + '  ŷ ' + fmt(Y);
+      var lx = x > 260 ? -124 : 12;
+      lbl.setAttribute('transform', 'translate(' + lx + ' ' + (y + 12).toFixed(2) + ')');
+    };
+    var tick = function(){
+      cur += (target - cur) * 0.2;
+      if (Math.abs(target - cur) < 0.05) cur = target;
+      render(cur);
+      raf = cur !== target ? requestAnimationFrame(tick) : 0;
+    };
+    svg.addEventListener('pointermove', function(e){
+      var b = svg.getBoundingClientRect();
+      target = Math.min(390, Math.max(30, (e.clientX - b.left) / b.width * 400));
+      if (cur === null || reduce || !cross.classList.contains('on')) cur = target;
+      cross.classList.add('on');
+      if (!raf) raf = requestAnimationFrame(tick);
+    });
+    svg.addEventListener('pointerleave', function(){ cross.classList.remove('on'); });
+  }
+
+  /* ---------- Capa gerada: bolsa ---------- */
+  var c = document.getElementById('candles');
+  if (c) {
+    var seed = 5, o3 = '', p = 110;
+    var rr = function(){ seed = (seed*9301 + 49297) % 233280; return seed/233280; };
+    for (var k = 0; k < 18; k++) {
+      var dd = (rr()-.48)*22, op = p, cl = p-dd, hi = Math.min(op,cl)-4-rr()*10, lo = Math.max(op,cl)+4+rr()*10, cx = 18+k*12, up = cl < op;
+      o3 += '<line x1="'+(cx+4)+'" y1="'+hi.toFixed(0)+'" x2="'+(cx+4)+'" y2="'+lo.toFixed(0)+'" stroke="#7E8A88"/><rect x="'+cx+'" y="'+Math.min(op,cl).toFixed(0)+'" width="8" height="'+Math.max(2,Math.abs(dd)).toFixed(0)+'" rx="1" fill="'+(up?'#2A8A7E':'#D0603F')+'"/>';
+      p = cl;
+    }
+    c.innerHTML = o3;
+  }
+
+  /* ---------- Revelar imagens (uma vez) ---------- */
+  var reveals = document.querySelectorAll('.reveal');
+  if (!('IntersectionObserver' in window)) {
+    reveals.forEach(function(e){ e.classList.add('in'); });
+  } else {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { rootMargin: '0px 0px -12% 0px' });
+    reveals.forEach(function(e){ io.observe(e); });
+  }
+
+  /* ---------- Menu: indicador por clip-path ----------
+     Uma cópia "ativa" da lista fica por cima e é recortada até o link
+     atual; a troca de cor sai perfeita, sem animar largura. */
+  var track = document.querySelector('.nav');
+  var links = [].slice.call(document.querySelectorAll('.nav-list a'));
+  var active = document.querySelector('.nav-active');
+  var sheetLinks = [].slice.call(document.querySelectorAll('.sheet a'));
+  var ids = ['sobre','trajetoria','projetos','academico','paralelos','competencias','formacao','contato'];
+  var secs = ids.map(function(id){ return document.getElementById(id); });
+  var current = -2;
+
+  var place = function(i, instant){
+    if (!track || !active) return;
+    if (i < 0 || i >= links.length) { active.classList.remove('show'); return; }
+    var a = links[i], L = a.offsetLeft, R = track.clientWidth - (a.offsetLeft + a.offsetWidth);
+    if (instant) active.style.transition = 'none';
+    active.style.clipPath = 'inset(0 ' + R + 'px 0 ' + L + 'px round 999px)';
+    if (instant) { active.offsetWidth; active.style.transition = ''; }
+    active.classList.add('show');
+  };
+  var setActive = function(i){
+    if (i === current) return;
+    var wasHidden = current < 0 || current >= links.length;
+    current = i;
+    links.forEach(function(a, j){ a.toggleAttribute('aria-current', j === i); });
+    sheetLinks.forEach(function(a, j){ a.setAttribute('aria-current', j === i ? 'true' : 'false'); });
+    place(i, wasHidden);
+  };
+  var spy = function(){
+    var line = innerHeight * 0.38, idx = -1;
+    secs.forEach(function(sct, i){ if (sct && sct.getBoundingClientRect().top <= line) idx = i; });
+    if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) idx = secs.length - 1;
+    setActive(idx);
+  };
+  var ticking = false;
+  addEventListener('scroll', function(){
+    if (ticking) return; ticking = true;
+    requestAnimationFrame(function(){ spy(); ticking = false; });
+  }, { passive: true });
+  addEventListener('resize', function(){ place(current, true); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ place(current, true); });
+  spy();
+
+  /* ---------- Menu mobile ---------- */
+  var btn = document.querySelector('.menu-btn'), sheet = document.getElementById('menu');
+  var label = btn && btn.querySelector('span');
+  var openMenu = function(){
+    sheet.removeAttribute('inert'); sheet.classList.add('open');
+    btn.setAttribute('aria-expanded', 'true'); label.textContent = 'Fechar';
+    document.documentElement.classList.add('lock');
+    var first = sheet.querySelector('a'); if (first) first.focus({ preventScroll: true });
+  };
+  var closeMenu = function(returnFocus){
+    sheet.classList.remove('open'); sheet.setAttribute('inert', '');
+    btn.setAttribute('aria-expanded', 'false'); label.textContent = 'Menu';
+    document.documentElement.classList.remove('lock');
+    if (returnFocus) btn.focus({ preventScroll: true });
+  };
+  if (btn && sheet) {
+    btn.addEventListener('click', function(){ sheet.classList.contains('open') ? closeMenu(true) : openMenu(); });
+    sheetLinks.forEach(function(a){ a.addEventListener('click', function(){ closeMenu(false); }); });
+    addEventListener('keydown', function(e){ if (e.key === 'Escape' && sheet.classList.contains('open')) closeMenu(true); });
+    matchMedia('(min-width: 1140px)').addEventListener('change', function(m){ if (m.matches && sheet.classList.contains('open')) closeMenu(false); });
+  }
+
+  /* ---------- Copiar e-mail (troca de rótulo com blur) ---------- */
+  var live = document.querySelector('.sr-live');
+  document.querySelectorAll('.copy').forEach(function(b){
+    var lbl = b.querySelector('.lbl'), timer;
+    var swap = function(text){
+      lbl.classList.add('swap');
+      setTimeout(function(){ lbl.textContent = text; lbl.classList.remove('swap'); }, reduce ? 0 : 150);
+    };
+    b.addEventListener('click', function(){
+      var t = b.getAttribute('data-copy');
+      var ok = function(){ b.classList.add('done'); swap('Copiado ✓'); if (live) live.textContent = 'E-mail copiado'; };
+      var fail = function(){ swap(t); };
+      try { navigator.clipboard.writeText(t).then(ok, fail); } catch (e) { fail(); }
+      clearTimeout(timer);
+      timer = setTimeout(function(){ b.classList.remove('done'); swap('Copiar'); }, 2400);
+    });
+  });
+
+  /* ---------- Hora local em Brasília ---------- */
+  var clock = document.getElementById('clock');
+  if (clock && window.Intl) {
+    var f = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' });
+    var upd = function(){ clock.textContent = f.format(new Date()); };
+    upd(); setInterval(upd, 20000);
+  }
+})();
+</script>
+</body>
+</html>
